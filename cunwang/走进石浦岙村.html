@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>走进石浦岙村 · 石浦岙村村网</title>
+<style>
+  /* ===== 基础与色板：旧照片暖褐、褪色绿、墨褐文字 ===== */
+  :root{
+    --paper:#f1e9d6;
+    --paper-2:#e7dcc2;
+    --ink:#3a2f22;
+    --ink-soft:#5c4d38;
+    --line:#b9a67e;
+    --accent:#6d5a34;
+    --accent-soft:#8a7344;
+    --card:rgba(244,236,217,.92);
+    --shadow:0 2px 10px rgba(58,47,34,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+    color:var(--ink);
+    background-color:#d8c9a3;
+    line-height:1.7;
+  }
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  img{display:block;max-width:100%}
+
+  /* ===== 背景层：旧照片 + 暖色压暗 + 纸张颗粒 ===== */
+  .bg-layer{
+    position:fixed;inset:0;z-index:-2;
+    background:url("assets/bg-village.jpg") center/cover no-repeat fixed;
+    filter:sepia(.28) saturate(.85) brightness(.92);
+  }
+  .bg-layer::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(58,47,34,.35) 0%,rgba(58,47,34,.18) 38%,rgba(216,201,163,.55) 100%);
+  }
+  .grain{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.18;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  /* ===== 顶部 ===== */
+  header.site{
+    background:rgba(58,47,34,.82);
+    color:var(--paper);
+    border-bottom:3px solid var(--accent-soft);
+  }
+  .site-top{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:18px 0 12px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand svg{width:44px;height:44px;flex:none}
+  .brand h1{font-size:26px;letter-spacing:.18em;font-weight:700}
+  .brand .sub{font-size:13px;letter-spacing:.3em;color:#d9c9a2;margin-top:2px}
+
+  /* 搜索框（子页占位，回到主页检索） */
+  .search{display:flex;gap:0;align-items:stretch}
+  .search input{
+    width:230px;padding:9px 12px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);font-family:inherit;font-size:14px;
+    outline:none;
+  }
+  .search button{
+    padding:9px 16px;border:1px solid var(--accent-soft);border-left:none;
+    background:var(--accent-soft);color:var(--paper);font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .search button:hover{background:var(--accent)}
+
+  /* 导航 */
+  nav.main{border-top:1px solid rgba(217,201,162,.25)}
+  nav.main ul{display:flex;flex-wrap:wrap;gap:4px}
+  nav.main a{
+    display:block;padding:12px 20px;font-size:15px;letter-spacing:.12em;
+    color:#e7dcc2;border-bottom:2px solid transparent;
+  }
+  nav.main a:hover,nav.main a.active{color:#fff;border-bottom-color:var(--accent-soft);background:rgba(255,255,255,.06)}
+
+  /* ===== 页内标题 ===== */
+  .page-head{padding:44px 0 10px;color:#f6eed8}
+  .page-head .crumb{font-size:13px;letter-spacing:.15em;color:#e4d5ac;margin-bottom:10px}
+  .page-head .crumb a:hover{text-decoration:underline}
+  .page-head h2{font-size:30px;letter-spacing:.22em;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+  .page-head p{margin-top:10px;font-size:15px;letter-spacing:.12em;color:#e4d5ac;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+
+  /* ===== 通用区块 ===== */
+  section.block{margin:30px 0}
+  .panel{
+    background:var(--card);border:1px solid var(--line);
+    box-shadow:var(--shadow);padding:24px 26px;
+  }
+  .panel h3{
+    font-size:20px;letter-spacing:.18em;color:var(--ink);
+    border-left:4px solid var(--accent-soft);padding-left:12px;margin-bottom:18px;
+  }
+  .panel h3 .meta{font-size:12px;color:var(--ink-soft);letter-spacing:.1em;margin-left:10px}
+
+  /* 走进石浦岙村 */
+  .about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:start}
+  .about-text p{margin:10px 0;font-size:15px;color:var(--ink-soft)}
+  .about-facts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .about-facts .fact{border:1px solid var(--line);background:var(--paper-2);padding:14px}
+  .about-facts .fact .k{font-size:12px;letter-spacing:.15em;color:var(--accent-soft);margin-bottom:6px}
+  .about-facts .fact .v{font-size:15px}
+
+  /* 历史沿革与民俗信仰 */
+  .history-text p{margin:12px 0;font-size:15px;color:var(--ink-soft);text-indent:2em}
+  .history-text p.lead{color:var(--ink)}
+  .history-fig{margin-top:22px}
+  .history-fig img{width:100%;height:auto;filter:sepia(.22) contrast(.95)}
+  .history-fig figcaption{font-size:13px;color:var(--ink-soft);padding:10px 2px 0;letter-spacing:.05em}
+
+  /* 返回 */
+  .back-link{display:inline-block;margin:10px 0 30px;font-size:14px;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+
+  /* 页脚 */
+  footer.site{
+    margin-top:40px;background:rgba(58,47,34,.88);color:#d9c9a2;
+    border-top:3px solid var(--accent-soft);padding:22px 0;
+  }
+  .footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;letter-spacing:.08em}
+  .footer-inner .links{display:flex;gap:18px;flex-wrap:wrap}
+  .footer-inner a:hover{color:#fff}
+
+  /* 响应式 */
+  @media (max-width:860px){
+    .about-grid{grid-template-columns:1fr}
+    .site-top{flex-direction:column;align-items:flex-start}
+    .search input{width:100%}
+    .search{width:100%}
+    .page-head h2{font-size:24px}
+  }
+  @media (max-width:520px){
+    .about-facts{grid-template-columns:1fr}
+    nav.main ul{gap:0}
+    nav.main a{padding:10px 12px;font-size:14px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ===== 顶部 ===== -->
+<header class="site">
+  <div class="wrap">
+    <div class="site-top">
+      <div class="brand">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="6" fill="#6d5a34"/>
+          <path d="M10 30h28l-4 7H14z" fill="#e7dcc2"/>
+          <path d="M24 12v13" stroke="#e7dcc2" stroke-width="2"/>
+          <path d="M24 14l9 8H24z" fill="#e7dcc2"/>
+          <path d="M8 39h32" stroke="#c9b887" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>石浦岙村</h1>
+          <div class="sub">沿海渔村 · 村务门户</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main" aria-label="主导航">
+      <ul>
+        <li><a href="index.html">首页</a></li>
+        <li><a href="走进石浦岙村.html" class="active">走进石浦岙村</a></li>
+        <li><a href="村公告栏.html">公告</a></li>
+        <li><a href="本地新闻.html">本地新闻</a></li>
+        <li><a href="村史图库.html">图库</a></li>
+        <li><a href="便民服务.html">便民服务</a></li>
+        <li><a href="留言板.html">留言板</a></li>
+        <li><a href="联系我们.html">联系我们</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== 页内标题 ===== -->
+  <div class="page-head">
+    <div class="crumb"><a href="index.html">首页</a> / 走进石浦岙村</div>
+    <h2>走进石浦岙村</h2>
+    <p>村落概况、历史沿革与民俗信仰</p>
+  </div>
+
+  <!-- ===== 村情概况 ===== -->
+  <section class="block" id="about">
+    <div class="panel">
+      <h3>村情概况 <span class="meta">村落概览</span></h3>
+      <div class="about-grid">
+        <div class="about-text">
+          <p>石浦岙村坐落在沿海一带，背靠低矮山峦，前临滩涂与近海。村子沿一条土路铺开，石墙老屋错落，屋旁常搁着修补中的旧木船，田地一直铺到岸边。</p>
+          <p>村民世代以近海捕捞和滩涂种养为生，兼种少量旱地作物。逢潮汛出海，闲时在晒场翻晒渔获与粮食，村道上往来的多是挑担、骑车的乡亲，日子缓慢而安稳。</p>
+          <p>村里老屋、旧船与田埂保留了早年的样貌，本栏用于记录村落的位置、物产与旧事，供在外的乡亲回乡时翻阅。</p>
+        </div>
+        <div class="about-facts">
+          <div class="fact">
+            <div class="k">地理位置</div>
+            <div class="v">沿海山麓，面朝滩涂</div>
+          </div>
+          <div class="fact">
+            <div class="k">主要生计</div>
+            <div class="v">近海捕捞 · 滩涂种养</div>
+          </div>
+          <div class="fact">
+            <div class="k">村落格局</div>
+            <div class="v">土路贯通，石屋沿路分布</div>
+          </div>
+          <div class="fact">
+            <div class="k">周边地貌</div>
+            <div class="v">远山 · 庄稼地 · 港湾</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 历史沿革与民俗信仰 ===== -->
+  <section class="block" id="history">
+    <div class="panel">
+      <h3>历史沿革与民俗信仰 <span class="meta">村志传说</span></h3>
+      <div class="history-text">
+        <p class="lead">石浦岙村建村于清乾隆年间，先民依山傍海，世代以近海捕捞和滩涂种养为生。村中民风淳朴，邻里和睦。村西头建有龙王庙一座，香火绵延数百年，是全村的精神寄托。</p>
+        <p>关于龙王庙的由来，村中流传着一段古老的传说。</p>
+        <p>据村志记载，民国三十二年间，时局动荡，海疆不宁。外敌盘踞沿海，封锁了港口航道，村中渔船无法下海，田里的庄稼被搜刮一空。全村老小靠树皮草根剥食，苦不堪言。</p>
+        <p>那年农历八月，一场罕见的强台风正面登陆石浦岙。狂风巨浪中，海面传来异响，见龙王破水而出，通体泛白，翻江倒海。一夜之间，盘踞附近海域的外敌尽数倾覆，死伤大半，残余者仓皇逃窜。</p>
+        <p>台风过后，村民感念其除暴安良、拯救百姓之恩。将此滩涂命名为“龙王滩”，并在村西头重建庙宇并塑像，世代供奉，以保出海平安、风调雨顺。</p>
+        <p>时至今日，那段苦难岁月已随风而去。石浦岙村依托丰富的海洋资源，发展冷链物流与水产品加工，村庄面貌焕然一新。但每逢农历八月，村中老人依然会到龙王庙上香祭拜，祈求平安。</p>
+      </div>
+      <figure class="history-fig">
+        <img src="assets/temple-old.jpg" alt="村西头龙王庙旧照，庙前立有功德碑">
+      </figure>
+    </div>
+  </section>
+
+  <a class="back-link" href="index.html">← 返回村网首页</a>
+
+</main>
+
+<!-- ===== 页脚 ===== -->
+<footer class="site">
+  <div class="wrap footer-inner">
+    <div>© 2026 石浦岙村村网 · 本站为村内门户示意页面</div>
+    <div class="links">
+      <a href="index.html">首页</a>
+      <a href="走进石浦岙村.html">走进石浦岙村</a>
+      <a href="联系我们.html">联系我们</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>献祭 · 村内档案系统</title>
+<style>
+  :root{
+    --paper:#f1e9d6;
+    --ink:#3a2f22;
+    --ink-soft:#5c4d38;
+    --line:#b9a67e;
+    --accent:#6d5a34;
+    --accent-soft:#8a7344;
+    --blood:#8a1f18;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+    min-height:100vh;color:var(--ink);background:#d8c9a3;line-height:1.8;
+    background-image:linear-gradient(180deg,rgba(58,47,34,.28),rgba(58,47,34,.12));
+  }
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+  .wrap{max-width:720px;margin:0 auto;padding:48px 24px}
+  .doc{background:rgba(244,236,217,.96);border:1px solid var(--line);box-shadow:0 4px 20px rgba(58,47,34,.25);padding:38px 34px;position:relative}
+  .doc::after{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.08;
+    background:repeating-linear-gradient(0deg,transparent 0 24px,var(--accent) 24px 25px);
+  }
+  .doc-head{text-align:center;margin-bottom:28px}
+  .doc-title{font-size:30px;letter-spacing:.3em;color:var(--blood);font-weight:700}
+  .doc-author{margin-top:12px;font-size:14px;letter-spacing:.15em;color:var(--ink-soft)}
+  .doc-meta{margin-top:6px;font-size:12px;letter-spacing:.1em;color:var(--ink-soft)}
+  .doc-body{min-height:260px;border-top:1px dashed var(--line);padding-top:22px;font-size:15px;color:var(--ink)}
+  .doc-body p{margin:12px 0}
+  .back{display:inline-block;margin-top:26px;font-size:13px;letter-spacing:.1em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+  .footer-note{margin-top:20px;text-align:center;font-size:11px;color:var(--ink-soft);letter-spacing:.08em}
+  [data-custom-element="doubao-watermark"]{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="doc">
+    <div class="doc-head">
+      <div class="doc-title">《献祭》</div>
+      <div class="doc-author">作者 ice-c</div>
+      <div class="doc-meta">村内档案系统 · 内部存档</div>
+    </div>
+    <div class="doc-body">
+      <p>1943年二战期间，日军占领石浦岙村，村民陷入极度饥荒。一场台风中，一只巨大的深海生物樽海鞘搁浅在浅滩，并意外吞噬了日军军舰。后村民因饥荒，也为了活命，分食了搁浅的樽海鞘。吃下肉的村民，基因发生变异，获得了犹如樽海鞘一样发芽的能力。之后村民的身体开始长一些多余的肢干，甚至长出一颗头，因为樽海鞘的尸体不足以解决当时的饥荒问题，村民后发现了一个残酷的种植法则：用村民的尸体当做土壤（基质），取长出的肢干做种子，种在土里长出新的肢叉，以此当作粮食。</p>
+      <p>而这个秘密，被包装成了“龙王保佑”的神话，只有村里的老一辈知道。</p>
+      <p>随着时间推移，村民体内的发芽基因逐渐退化，长出完整肢体的能力消失了，在村民们的胳膊或腿上只会留下米粒大小的肉瘤。陈寿身上有，他的女儿陈小小身上也有。</p>
+      <p>2025年10月，村里地震频发，陈寿本不想出海。但陈小小为了完成学校的作业《我的父亲》，软磨硬泡求父亲带她出海体验。陈寿溺爱女儿，抱着侥幸心理带她出了海。结果遭遇海啸，陈寿凭借极好的水性活了下来，陈小小却溺水身亡。</p>
+      <p>陈小小的尸体冲上岸时，身体因遗传基因抽搐，开始疯狂“发芽”，陈寿当时不懂，于是砍下女儿身上的芽体，小小彻底没了动静，后土葬于自家后院。</p>
+      <p>后来，陈寿从村里九十多岁的阿婆口中得知了“龙王（樽海鞘）和种植”的真相。他陷入了极致的疯狂与自责：女儿本来能活的，他却亲手砍死了女儿。</p>
+      <p>一个假道士为了报复村民（村民食用龙王，为忘恩负义行为），于是在村里卖“万能药”（由村民身上的肉瘤制成）。陈寿买来想救女儿，将药送入僵硬的女儿尸体嘴中，意外发现，女儿体内重新“发芽”。</p>
+      <p>陈寿觉醒了。他割下女儿身上的肉作为“种子”，埋进自家房子后面的那块空地。</p>
+      <p>可是，普通的土种不出人。他想起阿婆说的“死人做土”，于是，他把目光投向了村里的老人（如李长福）和流浪汉等。</p>
+      <p>从2026年开始，陈寿以各种借口将村里的老人骗到后山杀害，将尸体埋在自家地里做肥料。</p>
+      <p>但他发现，种出来的东西总是不对。“头部出芽率太低了”，长出过手指、胳膊、腿，但就是长不出女儿的脸。</p>
+      <p>为了种出女儿的头，他像疯了一样继续杀人，用更多的村民尸体肥土。</p>
+      <p>最终，在拆迁队推平他家房子前夕，他成功了。</p>
+      <p>他种出了一个怪物，那颗头颅有着陈小小十三岁时的面容，但脖子以下，没有躯干，而是密密麻麻长满了不同人的手和腿。怪物没有记忆，没有意识，像一个靠着无数手脚蠕动扎根在泥土里的畸形植物。而陈寿紧紧抱着这个怪物，把它当成了自己真正的女儿。</p>
+    </div>
+    <a class="back" href="档案系统登录.html">← 返回登录</a>
+  </div>
+  <div class="footer-note">本系统仅对村内登记人员开放</div>
+</div>
+
+</body>
+</html>

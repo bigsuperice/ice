@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>留言板 · 石浦岙村村网</title>
+<style>
+  :root{
+    --paper:#f1e9d6;
+    --paper-2:#e7dcc2;
+    --ink:#3a2f22;
+    --ink-soft:#5c4d38;
+    --line:#b9a67e;
+    --accent:#6d5a34;
+    --accent-soft:#8a7344;
+    --card:rgba(244,236,217,.92);
+    --shadow:0 2px 10px rgba(58,47,34,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+    color:var(--ink);background-color:#d8c9a3;line-height:1.7;
+  }
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  img{display:block;max-width:100%}
+
+  .bg-layer{
+    position:fixed;inset:0;z-index:-2;
+    background:url("assets/bg-village.jpg") center/cover no-repeat fixed;
+    filter:sepia(.28) saturate(.85) brightness(.92);
+  }
+  .bg-layer::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(58,47,34,.35) 0%,rgba(58,47,34,.18) 38%,rgba(216,201,163,.55) 100%);
+  }
+  .grain{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.18;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  header.site{background:rgba(58,47,34,.82);color:var(--paper);border-bottom:3px solid var(--accent-soft)}
+  .site-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0 12px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand svg{width:44px;height:44px;flex:none}
+  .brand h1{font-size:26px;letter-spacing:.18em;font-weight:700}
+  .brand .sub{font-size:13px;letter-spacing:.3em;color:#d9c9a2;margin-top:2px}
+
+  nav.main{border-top:1px solid rgba(217,201,162,.25)}
+  nav.main ul{display:flex;flex-wrap:wrap;gap:4px}
+  nav.main a{display:block;padding:12px 20px;font-size:15px;letter-spacing:.12em;color:#e7dcc2;border-bottom:2px solid transparent}
+  nav.main a:hover,nav.main a.active{color:#fff;border-bottom-color:var(--accent-soft);background:rgba(255,255,255,.06)}
+
+  .page-head{padding:44px 0 10px;color:#f6eed8}
+  .page-head .crumb{font-size:13px;letter-spacing:.15em;color:#e4d5ac;margin-bottom:10px}
+  .page-head .crumb a:hover{text-decoration:underline}
+  .page-head h2{font-size:30px;letter-spacing:.22em;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+  .page-head p{margin-top:10px;font-size:15px;letter-spacing:.12em;color:#e4d5ac;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+
+  section.block{margin:30px 0}
+  .panel{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);padding:24px 26px}
+  .panel h3{font-size:20px;letter-spacing:.18em;color:var(--ink);border-left:4px solid var(--accent-soft);padding-left:12px;margin-bottom:18px}
+  .panel h3 .meta{font-size:12px;color:var(--ink-soft);letter-spacing:.1em;margin-left:10px}
+
+  /* 留言表单 */
+  .board-form{display:grid;gap:12px;margin-bottom:20px}
+  .board-form .row{display:flex;gap:12px;flex-wrap:wrap}
+  .board-form input,.board-form textarea{
+    padding:10px 12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);
+    font-family:inherit;font-size:14px;outline:none;
+  }
+  .board-form textarea{min-height:74px;resize:vertical}
+  .board-form .row input{flex:1;min-width:160px}
+  .board-form button{
+    justify-self:start;padding:10px 22px;border:1px solid var(--accent-soft);
+    background:var(--accent-soft);color:var(--paper);font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .board-form button:hover{background:var(--accent)}
+
+  .board-list li{padding:12px 0;border-bottom:1px dashed var(--line)}
+  .board-list li:last-child{border-bottom:none}
+  .board-list .who{font-size:13px;color:var(--accent-soft);margin-bottom:4px}
+  .board-list .who .time{margin-left:10px;font-size:12px;color:var(--ink-soft)}
+  .board-list .msg{font-size:14px;color:var(--ink)}
+  .board-list .reply{margin-top:6px;padding-left:14px;border-left:2px solid var(--line);font-size:13px;color:var(--ink-soft)}
+  .board-list .reply .who{font-size:12px}
+  .hint{margin-top:14px;font-size:13px;color:var(--ink-soft)}
+
+  .back-link{display:inline-block;margin:10px 0 30px;font-size:14px;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+
+  footer.site{margin-top:40px;background:rgba(58,47,34,.82);color:var(--paper);border-top:3px solid var(--accent-soft)}
+  .footer-inner{display:flex;justify-content:space-between;gap:16px;padding:20px 0;flex-wrap:wrap;font-size:13px;color:#d9c9a2}
+  .footer-inner .links{display:flex;flex-wrap:wrap;gap:16px}
+  .footer-inner a:hover{text-decoration:underline}
+
+  @media(max-width:680px){
+    .board-form .row{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site">
+  <div class="wrap">
+    <div class="site-top">
+      <div class="brand">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="6" fill="#6d5a34"/>
+          <path d="M10 30h28l-4 7H14z" fill="#e7dcc2"/>
+          <path d="M24 12v13" stroke="#e7dcc2" stroke-width="2"/>
+          <path d="M24 14l9 8H24z" fill="#e7dcc2"/>
+          <path d="M8 39h32" stroke="#c9b887" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>石浦岙村</h1>
+          <div class="sub">沿海渔村 · 村务门户</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main" aria-label="主导航">
+      <ul>
+        <li><a href="index.html">首页</a></li>
+        <li><a href="走进石浦岙村.html">走进石浦岙村</a></li>
+        <li><a href="村公告栏.html">公告</a></li>
+        <li><a href="本地新闻.html">本地新闻</a></li>
+        <li><a href="村史图库.html">图库</a></li>
+        <li><a href="便民服务.html">便民服务</a></li>
+        <li><a href="留言板.html" class="active">留言板</a></li>
+        <li><a href="联系我们.html">联系我们</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head">
+    <div class="crumb"><a href="index.html">首页</a> / 留言板</div>
+    <h2>留言板</h2>
+    <p>乡亲留言与过往问询，按时间由新到旧排列</p>
+  </div>
+
+  <section class="block">
+    <div class="panel">
+      <h3>乡亲留言 <span class="meta">含历史留言</span></h3>
+      <form class="board-form" id="boardForm" novalidate>
+        <div class="row">
+          <input type="text" id="boardName" placeholder="称呼（选填）" autocomplete="off">
+          <input type="text" id="boardContact" placeholder="联系方式（选填）" autocomplete="off">
+        </div>
+        <textarea id="boardText" placeholder="写下你想说的话、建议或要反映的事项…"></textarea>
+        <button type="submit">提交留言</button>
+      </form>
+
+      <ul class="board-list" id="boardList">
+        <!-- 以下为现有留言（2026 年） -->
+        <li>
+          <div class="who">过路乡亲<span class="time">2026-11-15</span></div>
+          <div class="msg">村口土路雨天还是泥泞，希望铺填碎石那段能再延长一些。</div>
+        </li>
+        <li>
+          <div class="who">在外村民<span class="time">2026-11-10</span></div>
+          <div class="msg">看到老房子和旧船的照片，想起小时候在晒场看露天电影的日子。</div>
+        </li>
+        <li>
+          <div class="who">渔业户<span class="time">2026-11-06</span></div>
+          <div class="msg">入冬风浪渐大，提醒各家把船只缆绳再检查一遍，固定牢靠。</div>
+        </li>
+
+        <!-- 以下为更早的历史留言，时间由新到旧 -->
+        <li>
+          <div class="who">回村办事的年轻人<span class="time">2026-10-22</span></div>
+          <div class="msg">请问村里的管理员账号怎么查？想办点登记手续，不知道找谁要。</div>
+          <div class="reply">
+            <div class="who">村委会值班员<span class="time">2026-10-22</span></div>
+            <div class="msg">管理员账号就是村值班室的号码。</div>
+          </div>
+        </li>
+        <li>
+          <div class="who">老住户<span class="time">2026-10-15</span></div>
+          <div class="msg">村西头龙王庙后头那片地最近在勘测，想问下是不是要动工了？</div>
+        </li>
+        <li>
+          <div class="who">学生家长<span class="time">2026-09-28</span></div>
+          <div class="msg">石浦岙育红小学今年还收低年级新生吗？开学前想把孩子的户籍材料备齐。</div>
+          <div class="reply">
+            <div class="who">育红小学代课老师<span class="time">2026-09-28</span></div>
+            <div class="msg">新生登记还在进行，带户口簿到学校办公室登记即可，具体安排看公告栏通知。</div>
+          </div>
+        </li>
+        <li>
+          <div class="who">滩涂种养户<span class="time">2026-09-11</span></div>
+          <div class="msg">今年围塘修整后进水渠通畅多了，希望明年潮汛前再把塘埂加固一遍。</div>
+        </li>
+        <li>
+          <div class="who">在外打工的村里人<span class="time">2026-08-30</span></div>
+          <div class="msg">育红小学那排旧教室夏天漏雨，孩子们上课挪到隔壁厢房了，盼着能翻修一下。</div>
+        </li>
+        <li>
+          <div class="who">村里老人<span class="time">2026-08-12</span></div>
+          <div class="msg">农历八月又快到了，龙王庙上香的事今年还是按老规矩办吧，求个出海平安。</div>
+        </li>
+        <li>
+          <div class="who">养羊的农户<span class="time">2026-07-19</span></div>
+          <div class="msg">后山那片草场雨季滑，提醒各家把牲口看牢，别往坡底赶，免得走失滑下去。</div>
+        </li>
+        <li>
+          <div class="who">晒场看棚人<span class="time">2026-07-06</span></div>
+          <div class="msg">这几日日头好，各家抓紧把稻子、渔货翻晒一遍，天气预报说后半月多雨。</div>
+        </li>
+        <li>
+          <div class="who">在外打工的村里人<span class="time">2026-06-24</span></div>
+          <div class="msg">听说村里在丈量村西头那片老房子，打电话问问家里老人，安置的事心里没底。</div>
+        </li>
+        <li>
+          <div class="who">育红小学往届学生<span class="time">2026-06-18</span></div>
+          <div class="msg">多年没回村，还记得在石浦岙育红小学念书时，放学沿着土路往家走，路过老槐树和庄稼地。</div>
+        </li>
+        <li>
+          <div class="who">滩涂采贝户<span class="time">2026-06-11</span></div>
+          <div class="msg">退潮后滩涂上捡的小贝壳、花蛤今年个头不错，就是赶早出门的路不好走，盼着把段土路垫一垫。</div>
+        </li>
+        <li>
+          <div class="who">渔业小组<span class="time">2026-05-30</span></div>
+          <div class="msg">港湾木船集中检修那几天，各家把船桨、缆绳都清点一遍，入冬前务必归港固定。</div>
+        </li>
+        <li>
+          <div class="who">陈阿婆<span class="time">2026-05-09</span></div>
+          <div class="msg">龙王庙后头挖出的那张大皮囊，老人都说是当年龙王褪下的皮，专家怎么说咱们也不懂，只盼村里平安。</div>
+        </li>
+        <li>
+          <div class="who">看山的老汉<span class="time">2026-04-21</span></div>
+          <div class="msg">村后山地这阵子雨多、泥路打滑，上山砍柴、挖笋的乡亲务必结伴，别往老庙方向的陡坡走。</div>
+        </li>
+        <li>
+          <div class="who">守码头的人<span class="time">2026-04-06</span></div>
+          <div class="msg">码头台阶被潮水泡得发滑，老人小孩上下留神；涨潮时段别在堤边逗留。</div>
+        </li>
+        <li>
+          <div class="who">回乡探亲的人<span class="time">2026-03-17</span></div>
+          <div class="msg">几年没回来，港湾还是老样子，停着几艘木船，岸边石墙刷了新石灰，看着比以前整齐。</div>
+        </li>
+      </ul>
+      <p class="hint" id="boardHint"></p>
+    </div>
+  </section>
+
+  <a class="back-link" href="index.html">← 返回村网首页</a>
+
+</main>
+
+<footer class="site">
+  <div class="wrap footer-inner">
+    <div>© 2026 石浦岙村村网 · 本站为村内门户示意页面</div>
+    <div class="links">
+      <a href="index.html">首页</a>
+      <a href="走进石浦岙村.html">走进石浦岙村</a>
+      <a href="村公告栏.html">公告</a>
+      <a href="联系我们.html">联系我们</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ===== 留言板：本地追加，刷新后不保留 ===== */
+  (function(){
+    var form=document.getElementById('boardForm');
+    var list=document.getElementById('boardList');
+    var hint=document.getElementById('boardHint');
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var name=document.getElementById('boardName').value.trim();
+      var text=document.getElementById('boardText').value.trim();
+      if(!text){hint.textContent='留言内容不能为空';return;}
+      var li=document.createElement('li');
+      var who=document.createElement('div');
+      who.className='who';
+      var now=new Date();
+      var stamp=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+      who.textContent=name||'匿名村民';
+      var time=document.createElement('span');
+      time.className='time';
+      time.textContent=stamp;
+      who.appendChild(time);
+      var msg=document.createElement('div');
+      msg.className='msg';
+      msg.textContent=text;
+      li.appendChild(who);
+      li.appendChild(msg);
+      list.insertBefore(li,list.firstChild);
+      form.reset();
+      hint.textContent='留言已提交（本地演示，刷新后不保留）';
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>石浦岙村 · 村网主页</title>
+<style>
+  /* ===== 基础与色板：旧照片暖褐、褪色绿、墨褐文字 ===== */
+  :root{
+    --paper:#f1e9d6;
+    --paper-2:#e7dcc2;
+    --ink:#3a2f22;
+    --ink-soft:#5c4d38;
+    --line:#b9a67e;
+    --accent:#6d5a34;
+    --accent-soft:#8a7344;
+    --card:rgba(244,236,217,.92);
+    --shadow:0 2px 10px rgba(58,47,34,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+    color:var(--ink);
+    background-color:#d8c9a3;
+    line-height:1.7;
+  }
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  img{display:block;max-width:100%}
+
+  /* ===== 背景层：旧照片 + 暖色压暗 + 纸张颗粒 ===== */
+  .bg-layer{
+    position:fixed;inset:0;z-index:-2;
+    background:url("assets/bg-village.jpg") center/cover no-repeat fixed;
+    filter:sepia(.28) saturate(.85) brightness(.92);
+  }
+  .bg-layer::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(58,47,34,.35) 0%,rgba(58,47,34,.18) 38%,rgba(216,201,163,.55) 100%);
+  }
+  .grain{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.18;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  /* ===== 顶部 ===== */
+  header.site{
+    background:rgba(58,47,34,.82);
+    color:var(--paper);
+    border-bottom:3px solid var(--accent-soft);
+  }
+  .site-top{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;
+    padding:18px 0 12px;flex-wrap:wrap;
+  }
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand svg{width:44px;height:44px;flex:none}
+  .brand h1{font-size:26px;letter-spacing:.18em;font-weight:700}
+  .brand .sub{font-size:13px;letter-spacing:.3em;color:#d9c9a2;margin-top:2px}
+
+  /* 搜索框 */
+  .search{display:flex;gap:0;align-items:stretch}
+  .search input{
+    width:230px;padding:9px 12px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);font-family:inherit;font-size:14px;
+    outline:none;
+  }
+  .search button{
+    padding:9px 16px;border:1px solid var(--accent-soft);border-left:none;
+    background:var(--accent-soft);color:var(--paper);font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .search button:hover{background:var(--accent)}
+
+  /* 导航 */
+  nav.main{border-top:1px solid rgba(217,201,162,.25)}
+  nav.main ul{display:flex;flex-wrap:wrap;gap:4px}
+  nav.main a{
+    display:block;padding:12px 20px;font-size:15px;letter-spacing:.12em;
+    color:#e7dcc2;border-bottom:2px solid transparent;
+  }
+  nav.main a:hover,nav.main a.active{color:#fff;border-bottom-color:var(--accent-soft);background:rgba(255,255,255,.06)}
+
+  /* ===== Hero 横幅 ===== */
+  .hero{padding:64px 0 40px;text-align:center;color:#f6eed8}
+  .hero h2{font-size:34px;letter-spacing:.25em;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+  .hero p{margin-top:12px;font-size:15px;letter-spacing:.15em;color:#e4d5ac;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+
+  /* ===== 通用区块 ===== */
+  section.block{margin:34px 0}
+  .panel{
+    background:var(--card);border:1px solid var(--line);
+    box-shadow:var(--shadow);padding:24px 26px;
+  }
+  .panel h3{
+    font-size:20px;letter-spacing:.18em;color:var(--ink);
+    border-left:4px solid var(--accent-soft);padding-left:12px;margin-bottom:18px;
+  }
+  .panel h3 .meta{font-size:12px;color:var(--ink-soft);letter-spacing:.1em;margin-left:10px}
+
+  /* 公告 */
+  .notice-list li{
+    display:flex;gap:14px;align-items:baseline;
+    padding:11px 0;border-bottom:1px dashed var(--line);
+  }
+  .notice-list li:last-child{border-bottom:none}
+  .notice-list .date{
+    flex:none;font-size:13px;color:var(--accent-soft);letter-spacing:.05em;
+    width:88px;
+  }
+  .notice-list .tag{
+    flex:none;font-size:12px;border:1px solid var(--line);color:var(--ink-soft);
+    padding:1px 8px;border-radius:2px;
+  }
+  .notice-list a:hover{color:var(--accent)}
+  .notice-list .title{flex:1;min-width:0}
+
+  /* 双栏：新闻 + 图库 */
+  .cols{display:grid;grid-template-columns:1.15fr 1fr;gap:24px}
+
+  /* 新闻 */
+  .news-item{padding:14px 0;border-bottom:1px dashed var(--line)}
+  .news-item:last-child{border-bottom:none}
+  .news-item h4{font-size:16px;margin-bottom:4px}
+  .news-item h4 a:hover{color:var(--accent)}
+  .news-item .news-meta{font-size:12px;color:var(--ink-soft);margin-bottom:6px;letter-spacing:.05em}
+  .news-item p{font-size:14px;color:var(--ink-soft)}
+
+  /* 图库 */
+  .gallery{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .figure{border:1px solid var(--line);background:var(--paper-2);padding:8px}
+  .figure img{width:100%;height:150px;object-fit:cover;filter:sepia(.18)}
+  .figure figcaption{font-size:13px;padding:8px 4px 2px;color:var(--ink-soft)}
+
+  /* 联系我们 */
+  .contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .contact-grid .item{border-top:1px solid var(--line);padding-top:12px}
+  .contact-grid .item .label{font-size:13px;color:var(--accent-soft);letter-spacing:.15em;margin-bottom:4px}
+  .contact-grid .item .value{font-size:15px}
+
+  /* 走进石浦岙村 */
+  .about-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:24px;align-items:start}
+  .about-text p{margin:10px 0;font-size:15px;color:var(--ink-soft)}
+  .about-facts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .about-facts .fact{border:1px solid var(--line);background:var(--paper-2);padding:14px}
+  .about-facts .fact .k{font-size:12px;letter-spacing:.15em;color:var(--accent-soft);margin-bottom:6px}
+  .about-facts .fact .v{font-size:15px}
+
+  /* 便民服务 */
+  .service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .service-card{border:1px solid var(--line);background:var(--paper-2);padding:18px}
+  .service-card h4{font-size:16px;margin-bottom:8px;letter-spacing:.05em}
+  .service-card p{font-size:13px;color:var(--ink-soft)}
+  .service-card .service-meta{margin-top:10px;font-size:12px;color:var(--accent-soft);letter-spacing:.05em}
+
+  /* 留言板 */
+  .board-form{display:grid;gap:12px;margin-bottom:20px}
+  .board-form .row{display:flex;gap:12px;flex-wrap:wrap}
+  .board-form input,.board-form textarea{
+    width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--paper);
+    font-family:inherit;font-size:14px;color:var(--ink);outline:none;
+  }
+  .board-form textarea{min-height:74px;resize:vertical}
+  .board-form .row input{flex:1;min-width:160px}
+  .board-form button{
+    justify-self:start;padding:9px 22px;border:1px solid var(--accent-soft);
+    background:var(--accent);color:var(--paper);font-family:inherit;font-size:14px;letter-spacing:.15em;cursor:pointer;
+  }
+  .board-form button:hover{background:var(--accent-soft)}
+  .board-list li{padding:12px 0;border-bottom:1px dashed var(--line)}
+  .board-list li:last-child{border-bottom:none}
+  .board-list .who{font-size:13px;color:var(--accent-soft);margin-bottom:4px}
+  .board-list .who .time{margin-left:10px;font-size:12px;color:var(--ink-soft)}
+  .board-list .msg{font-size:14px;color:var(--ink)}
+
+  /* 页脚 */
+  footer.site{
+    margin-top:40px;background:rgba(58,47,34,.88);color:#d9c9a2;
+    border-top:3px solid var(--accent-soft);padding:22px 0;
+  }
+  .footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;letter-spacing:.08em}
+  .footer-inner .links{display:flex;gap:18px}
+  .footer-inner a:hover{color:#fff}
+
+  /* 搜索提示条 */
+  .hint{margin-top:10px;font-size:13px;color:var(--ink-soft)}
+  .hint mark{background:rgba(138,115,68,.18);color:var(--accent);padding:0 2px}
+
+  /* ===== 隐藏线索页：默认不渲染，仅检索命中后显示 ===== */
+  .hidden-case{display:none}
+  .hidden-case.on{display:block}
+  .case-panel{
+    background:rgba(233,223,196,.96);border:1px solid var(--line);
+    box-shadow:var(--shadow);padding:28px 30px;position:relative;
+  }
+  .case-panel::before{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.1;
+    background:repeating-linear-gradient(0deg,transparent 0 22px,#6d5a34 22px 23px);
+  }
+  .case-eyebrow{font-size:12px;letter-spacing:.3em;color:var(--accent-soft);margin-bottom:10px}
+  .case-panel h3{font-size:22px;letter-spacing:.12em;margin-bottom:6px}
+  .case-meta{font-size:13px;color:var(--ink-soft);margin-bottom:18px;letter-spacing:.05em}
+  .case-body p{margin:12px 0;font-size:15px;color:var(--ink)}
+  .case-facts{margin:18px 0;padding:16px 18px;border-left:3px solid var(--accent-soft);background:rgba(244,236,217,.7)}
+  .case-facts li{padding:6px 0;font-size:14px}
+  .case-facts li b{color:var(--ink-soft)}
+  .case-foot{margin-top:18px;font-size:13px;color:var(--ink-soft);border-top:1px dashed var(--line);padding-top:14px}
+  .case-back{display:inline-block;margin-top:14px;font-size:13px;letter-spacing:.1em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+  .case-figure{margin:18px 0 4px}
+  .case-figure img{width:100%;max-height:480px;object-fit:contain;border:1px solid var(--line);filter:sepia(.22) saturate(.85);background:#2a2118}
+
+  /* ===== 隐藏校园网：育红小学 ===== */
+  .school-head{border-bottom:2px solid var(--accent-soft);padding-bottom:16px;margin-bottom:20px}
+  .school-head .school-badge{display:inline-flex;align-items:center;gap:10px;font-size:12px;letter-spacing:.3em;color:var(--accent-soft);margin-bottom:8px}
+  .school-head h3{font-size:24px;letter-spacing:.14em}
+  .school-head .school-motto{margin-top:6px;font-size:14px;color:var(--ink-soft);letter-spacing:.1em}
+  .school-nav{display:flex;flex-wrap:wrap;gap:4px;margin:18px 0}
+  .school-nav button{
+    font-family:inherit;font-size:14px;letter-spacing:.1em;cursor:pointer;
+    background:var(--paper-2);border:1px solid var(--line);color:var(--ink-soft);padding:8px 16px;
+  }
+  .school-nav button.active{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+  .school-view{display:none}
+  .school-view.on{display:block}
+  .school-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .school-card{border:1px solid var(--line);background:rgba(244,236,217,.7);padding:16px 18px}
+  .school-card h4{font-size:15px;letter-spacing:.12em;color:var(--accent);margin-bottom:8px}
+  .school-card p{font-size:14px;color:var(--ink)}
+  .school-card .meta{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.05em}
+  .school-figure{margin:16px 0 4px}
+  .school-figure img{width:100%;max-height:360px;object-fit:cover;border:1px solid var(--line);filter:sepia(.3) saturate(.8) brightness(.92) blur(.6px)}
+  .school-figure figcaption{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.05em}
+  .school-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:14px}
+  .school-table th,.school-table td{border:1px solid var(--line);padding:8px 10px}
+  .school-table th{background:var(--paper-2);letter-spacing:.1em;color:var(--ink-soft)}
+  .school-table td.center{text-align:center}
+  .school-news li{padding:10px 0;border-bottom:1px dashed var(--line);cursor:pointer}
+  .school-news li:hover{background:rgba(138,115,68,.1)}
+  .school-news li:last-child{border-bottom:none}
+  .school-news .t{font-size:15px}
+  .school-news .m{font-size:12px;color:var(--ink-soft);margin-top:3px;letter-spacing:.05em}
+  .school-detail{margin-top:18px;border-top:1px solid var(--line);padding-top:18px}
+  .school-detail-title{font-size:19px;letter-spacing:.1em;margin:12px 0 6px}
+  .school-detail .case-body p{margin:10px 0;font-size:15px}
+  .count-link{color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+  .count-link:hover{color:var(--accent-soft)}
+  .roster-status.expel{color:#8a2b22;font-weight:700}
+  .roster-status.leave{color:var(--ink-soft)}
+  @media(max-width:680px){.school-grid{grid-template-columns:1fr}}
+
+  /* 签约表 */
+  .sign-table{width:100%;border-collapse:collapse;margin-top:16px;font-size:14px}
+  .sign-table th,.sign-table td{border:1px solid var(--line);padding:8px 10px;text-align:center}
+  .sign-table th{background:var(--paper-2);letter-spacing:.1em;color:var(--ink-soft)}
+  .sign-table td.name{text-align:left}
+  .sign-table .tick{color:var(--accent);font-weight:700}
+  .sign-table .blank{color:var(--ink-soft)}
+  .sign-note{margin-top:10px;font-size:12px;color:var(--ink-soft);letter-spacing:.05em}
+  .sign-pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .sign-pager button{
+    border:1px solid var(--line);background:var(--paper-2);color:var(--ink);
+    font-family:inherit;font-size:13px;padding:5px 11px;cursor:pointer;border-radius:2px;
+  }
+  .sign-pager button:hover{background:var(--paper)}
+  .sign-pager button.active{background:var(--accent);color:var(--paper);border-color:var(--accent)}
+  .sign-pager button:disabled{opacity:.4;cursor:default}
+  .sign-pager .page-info{font-size:12px;color:var(--ink-soft);margin:0 6px}
+
+  /* 响应式 */
+  @media (max-width:860px){
+    .cols{grid-template-columns:1fr}
+    .contact-grid{grid-template-columns:1fr 1fr}
+    .about-grid{grid-template-columns:1fr}
+    .service-grid{grid-template-columns:1fr 1fr}
+    .site-top{flex-direction:column;align-items:flex-start}
+    .search input{width:100%}
+    .search{width:100%}
+    .hero h2{font-size:26px}
+  }
+  @media (max-width:520px){
+    .gallery{grid-template-columns:1fr}
+    .contact-grid{grid-template-columns:1fr}
+    .about-facts{grid-template-columns:1fr}
+    .service-grid{grid-template-columns:1fr}
+    nav.main ul{gap:0}
+    nav.main a{padding:10px 12px;font-size:14px}
+  }
+
+  /* ===== 客服浮窗 ===== */
+  .cs-fab{
+    position:fixed;right:22px;bottom:22px;z-index:1000;
+    width:54px;height:54px;border-radius:50%;border:1px solid var(--accent-soft);
+    background:var(--accent);color:var(--paper);cursor:pointer;
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);
+  }
+  .cs-fab:hover{background:var(--accent-soft)}
+  .cs-fab svg{width:26px;height:26px}
+  .cs-panel{
+    position:fixed;right:22px;bottom:88px;z-index:1000;width:320px;max-width:calc(100vw - 32px);
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);
+    display:none;flex-direction:column;overflow:hidden;
+  }
+  .cs-panel.open{display:flex}
+  .cs-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 16px;background:var(--accent);color:var(--paper);
+  }
+  .cs-head .title{font-size:15px;letter-spacing:.12em}
+  .cs-head .close{background:none;border:none;color:var(--paper);cursor:pointer;font-size:18px;line-height:1;padding:4px}
+  .cs-body{height:280px;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+  .cs-msg{max-width:82%;padding:8px 11px;font-size:13px;line-height:1.6;border-radius:6px}
+  .cs-msg.bot{background:var(--paper-2);color:var(--ink);align-self:flex-start}
+  .cs-msg.user{background:var(--accent-soft);color:var(--paper);align-self:flex-end}
+  .cs-msg .cs-time{display:block;font-size:11px;color:var(--ink-soft);margin-top:3px}
+  .cs-input{display:flex;gap:8px;padding:12px 14px;border-top:1px solid var(--line)}
+  .cs-input input{
+    flex:1;min-width:0;padding:9px 11px;border:1px solid var(--line);background:var(--paper);
+    font-family:inherit;font-size:14px;color:var(--ink);outline:none;
+  }
+  .cs-input button{
+    flex:none;padding:9px 14px;border:1px solid var(--accent-soft);background:var(--accent);
+    color:var(--paper);font-family:inherit;font-size:13px;cursor:pointer;
+  }
+  .cs-input button:hover{background:var(--accent-soft)}
+</style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- ===== 顶部 ===== -->
+<header class="site">
+  <div class="wrap">
+    <div class="site-top">
+      <div class="brand">
+        <!-- 简易船与岸线图标 -->
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="6" fill="#6d5a34"/>
+          <path d="M10 30h28l-4 7H14z" fill="#e7dcc2"/>
+          <path d="M24 12v13" stroke="#e7dcc2" stroke-width="2"/>
+          <path d="M24 14l9 8H24z" fill="#e7dcc2"/>
+          <path d="M8 39h32" stroke="#c9b887" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>石浦岙村</h1>
+          <div class="sub">沿海渔村 · 村务门户</div>
+        </div>
+      </div>
+
+      <!-- 站内搜索 -->
+      <form class="search" id="searchForm" role="search">
+        <input type="text" id="searchInput" placeholder="搜索公告、新闻、图库…" aria-label="站内搜索">
+        <button type="submit">查找</button>
+      </form>
+    </div>
+
+    <nav class="main" aria-label="主导航">
+      <ul>
+        <li><a href="#home" class="active">首页</a></li>
+        <li><a href="走进石浦岙村.html">走进石浦岙村</a></li>
+        <li><a href="村公告栏.html">公告</a></li>
+        <li><a href="本地新闻.html">本地新闻</a></li>
+        <li><a href="村史图库.html">图库</a></li>
+        <li><a href="便民服务.html">便民服务</a></li>
+        <li><a href="留言板.html">留言板</a></li>
+        <li><a href="联系我们.html">联系我们</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<!-- ===== Hero ===== -->
+<div class="wrap" id="home">
+  <div class="hero">
+    <h2>海风过岙 · 村落依旧</h2>
+    <p>这里记录石浦岙村的村务通知、乡间见闻与旧日影像</p>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <!-- ===== 公告 ===== -->
+  <section class="block" id="notice">
+    <div class="panel">
+      <h3>村公告栏 <span class="meta">最新通知 · <a href="村公告栏.html" style="color:var(--accent)">查看全部</a></span></h3>
+      <ul class="notice-list" id="noticeList">
+        <li>
+          <span class="date">11-16</span>
+          <span class="tag">村务</span>
+          <a class="title" href="村公告栏.html">冬季防火与沿海防风工作安排，请各户留意屋檐、柴草堆放与渔船固定。</a>
+        </li>
+        <li>
+          <span class="date">11-12</span>
+          <span class="tag">缴费</span>
+          <a class="title" href="村公告栏.html">本年度农村合作医疗缴费登记截止本月底，未办理的村民请到村委会登记。</a>
+        </li>
+        <li>
+          <span class="date">11-08</span>
+          <span class="tag">活动</span>
+          <a class="title" href="村公告栏.html">村口晒场将于农历廿三放映露天电影，傍晚六点开场，欢迎乡亲到场。</a>
+        </li>
+        <li>
+          <span class="date">11-03</span>
+          <span class="tag">通知</span>
+          <a class="title" href="村公告栏.html">海边滩涂近期水位受潮汐影响，请勿带孩童在未划定区域下滩玩耍。</a>
+        </li>
+      </ul>
+      <p class="hint" id="noticeHint"></p>
+    </div>
+  </section>
+
+  <!-- ===== 双栏：本地新闻 + 图库 ===== -->
+  <div class="cols">
+
+    <section class="block" id="news" style="margin-top:0">
+      <div class="panel">
+        <h3>本地新闻 <span class="meta">乡间近况</span></h3>
+        <div id="newsList">
+          <article class="news-item">
+            <h4><a href="本地新闻.html">滩涂围塘修整完工，近海养殖恢复如常</a></h4>
+            <div class="news-meta">2026-11-15 · 村委会</div>
+            <p>村口外侧的旧围塘经过半个多月清淤加固，塘埂与进水渠已修整完毕，养殖户陆续下苗，海面恢复往日平静。</p>
+          </article>
+          <article class="news-item">
+            <h4><a href="本地新闻.html">老槐树下的晒场迎来秋收最后一茬</a></h4>
+            <div class="news-meta">2026-11-09 · 村通讯</div>
+            <p>土路两旁的庄稼地陆续收完，乡亲们把粮食摊在晒场上翻晒，午后日头正好，空气里都是谷物的气味。</p>
+          </article>
+          <article class="news-item">
+            <h4><a href="本地新闻.html">港湾木船集中检修，准备入冬避风</a></h4>
+            <div class="news-meta">2026-11-05 · 渔业组</div>
+            <p>几艘旧木船靠在港湾石滩边补缝上油，船主趁风浪尚小把船体检修一遍，为临近的冬季大风天做好准备。</p>
+          </article>
+          <article class="news-item">
+            <h4><a href="本地新闻.html">村道土路铺填碎石，雨天泥泞有所改善</a></h4>
+            <div class="news-meta">2026-10-28 · 村务简报</div>
+            <p>通往海边一段坑洼土路已铺填碎石并平整路基，骑车挑担进出比从前顺当，后续将视情况继续维护。</p>
+          </article>
+        </div>
+        <p class="hint" id="newsHint"></p>
+      </div>
+    </section>
+
+    <section class="block" id="gallery" style="margin-top:0">
+      <div class="panel">
+        <h3>村史图库 <span class="meta">旧日影像</span></h3>
+        <div class="gallery">
+          <figure class="figure">
+            <img src="assets/photo1.jpg" alt="石屋与旧渔船">
+            <figcaption>石屋旁搁着的旧渔船</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/photo2.jpg" alt="滩涂与海面">
+            <figcaption>退潮后的滩涂与远海</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/photo3.jpg" alt="老槐树与庄稼地">
+            <figcaption>土路旁的老槐树与田地</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/photo4.jpg" alt="港湾停泊的木船">
+            <figcaption>港湾里停泊的木船</figcaption>
+          </figure>
+        </div>
+        <p class="hint" id="galleryHint"></p>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ===== 便民服务 ===== -->
+  <section class="block" id="service">
+    <div class="panel">
+      <h3>便民服务 <span class="meta">村内常用事项</span></h3>
+      <div class="service-grid">
+        <div class="service-card">
+          <h4>合作医疗登记</h4>
+          <p>新农合缴费、参保信息核对与报销材料代收，逢办公时间到村委会办理。</p>
+          <div class="service-meta">办理地点：村委会平房</div>
+        </div>
+        <div class="service-card">
+          <h4>户籍与证明开具</h4>
+          <p>居住证明、亲属关系等村级证明材料，由村委核实后出具。</p>
+          <div class="service-meta">需携带：户口簿</div>
+        </div>
+        <div class="service-card">
+          <h4>渔船与滩涂登记</h4>
+          <p>近海作业船只、滩涂种养户的信息登记与年度核对，由渔业组受理。</p>
+          <div class="service-meta">对接：村渔业小组</div>
+        </div>
+        <div class="service-card">
+          <h4>水电与道路报修</h4>
+          <p>村道坑洼、供水管线及公共照明故障，可到值班室登记，统一安排修缮。</p>
+          <div class="service-meta">受理：村值班室</div>
+        </div>
+        <div class="service-card">
+          <h4>老人与帮扶代办</h4>
+          <p>行动不便的老人可委托村委代办缴费、取件等日常事项。</p>
+          <div class="service-meta">对接：村便民联络员</div>
+        </div>
+        <div class="service-card">
+          <h4>农事与气象提醒</h4>
+          <p>潮汛、大风与降温天气提醒，以及种养时节的通知，在公告栏同步发布。</p>
+          <div class="service-meta">查看：村公告栏</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 留言板 ===== -->
+  <section class="block" id="board">
+    <div class="panel">
+      <h3>留言板 <span class="meta">乡亲留言</span></h3>
+      <form class="board-form" id="boardForm" novalidate>
+        <div class="row">
+          <input type="text" id="boardName" placeholder="称呼（选填）" autocomplete="off">
+          <input type="text" id="boardContact" placeholder="联系方式（选填）" autocomplete="off">
+        </div>
+        <textarea id="boardText" placeholder="写下你想说的话、建议或要反映的事项…"></textarea>
+        <button type="submit">提交留言</button>
+      </form>
+      <ul class="board-list" id="boardList">
+        <li>
+          <div class="who">过路乡亲<span class="time">11-15</span></div>
+          <div class="msg">村口土路雨天还是泥泞，希望铺填碎石那段能再延长一些。</div>
+        </li>
+        <li>
+          <div class="who">在外村民<span class="time">11-10</span></div>
+          <div class="msg">看到老房子和旧船的照片，想起小时候在晒场看露天电影的日子。</div>
+        </li>
+        <li>
+          <div class="who">渔业户<span class="time">11-06</span></div>
+          <div class="msg">入冬风浪渐大，提醒各家把船只缆绳再检查一遍，固定牢靠。</div>
+        </li>
+      </ul>
+      <p class="hint" id="boardHint"></p>
+    </div>
+  </section>
+
+  <!-- ===== 联系我们 ===== -->
+  <section class="block" id="contact">
+    <div class="panel">
+      <h3>联系我们 <span class="meta">村务办理</span></h3>
+      <div class="contact-grid">
+        <div class="item">
+          <div class="label">村委会地址</div>
+          <div class="value">石浦岙村老晒场东首平房</div>
+        </div>
+        <div class="item">
+          <div class="label">值班电话</div>
+          <div class="value">村值班室 0916-6248317</div>
+        </div>
+        <div class="item">
+          <div class="label">办公时间</div>
+          <div class="value">逢农历双日上午 8:00–11:30</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+
+
+<!-- ===== 隐藏页：仅检索“拆迁安置细则”时出现，导航与页脚均不提供入口 ===== -->
+<section class="block hidden-case" id="hiddenRule" aria-hidden="true">
+  <div class="wrap">
+    <div class="case-panel">
+      <div class="case-eyebrow">拆迁安置 · 内部细则摘录</div>
+      <h3>拆迁安置细则（简易说明）</h3>
+      <div class="case-meta">依据滨海社区改造项目指挥部公布口径整理 · 以下为摘要，最终以正式协议为准</div>
+
+      <div class="case-body">
+        <p>本次拆迁范围涵盖石浦岙村全村。村民按户籍与房屋权属登记在册，以户为单位签订安置补偿协议。</p>
+        <p>安置方式分为产权置换与货币补偿两类：选择置换的，按原房屋面积核算安置新房；选择货币补偿的，参照评估标准一次性结算。附属设施、青苗及地上附着物按丈量登记情况另行补偿。</p>
+        <p>签约期限内完成签约的住户，按规定享受搬迁奖励；逾期未签约的，不再享受当期奖励。搬迁过渡期间，由指挥部统一发放过渡补助。</p>
+      </div>
+
+      <h3 style="font-size:16px;margin:20px 0 4px">村民签约登记表</h3>
+      <p class="case-meta">下表为在册住户签约情况，“√”表示已签订安置协议。</p>
+      <table class="sign-table">
+        <colgroup><col style="width:16%"><col style="width:30%"><col style="width:22%"><col style="width:32%"></colgroup>
+        <thead>
+          <tr><th>序号</th><th>姓名</th><th>性别</th><th>签约</th></tr>
+        </thead>
+        <tbody id="signBody"></tbody>
+      </table>
+      <div class="sign-pager" id="signPager"></div>
+      <p class="sign-note">注：本表为村内登记摘录，个别信息以正式协议为准。</p>
+
+      <p class="case-foot">本页为内部细则摘要，不构成最终补偿依据；如有疑问，可到村委会或指挥部咨询。</p>
+      <a class="case-back" href="#home" id="ruleBack">返回村网首页</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 隐藏页：仅检索“陈寿”时出现，导航与页脚均不提供入口 ===== -->
+<section class="block hidden-case" id="hiddenRescue" aria-hidden="true">
+  <div class="wrap">
+    <div class="case-panel">
+      <div class="case-eyebrow">现场记录 · 未公开消息</div>
+      <h3>拆迁施工队发现一对遇险父女，有关部门已介入救助</h3>
+      <div class="case-meta">2026-11-18 · 镇宣传办 · 以下为现场情况摘录</div>
+
+      <div class="case-body">
+        <p>今日夜晚，施工队在对村西头一处老旧平房进行强制清表作业时，一老者从倒塌的房屋废墟中爬出，面容惨白。</p>
+        <p>经现场辨认，老者为本村村民陈某，现已处于昏迷状态，双手死死抱住身边女孩。该女孩面部完好，但其颈部以下并没有正常的躯干，长满密密麻麻、长短不一的手臂和腿脚，现场施工人员受到极度惊吓，已安排心理疏导。</p>
+        <p>目前，卫生部门与派出所已封锁现场，该女孩已交由上级医疗机构进行紧急隔离检验。专家初步怀疑为罕见的基因突变或先天畸形。</p>
+      </div>
+
+      <figure class="case-figure">
+        <img src="assets/rescue-night.jpg" alt="现场模糊抓拍">
+      </figure>
+
+      <p class="case-foot">本页内容为现场情况摘录，不代表最终结论；相关处置以卫生部门与派出所通报为准。</p>
+      <a class="case-back" href="#home" id="rescueBack">返回村网首页</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 隐藏页：仅检索“育红小学”时出现，导航与页脚均不提供入口 ===== -->
+<section class="block hidden-case" id="hiddenSchool" aria-hidden="true">
+  <div class="wrap">
+    <div class="case-panel">
+      <div class="case-eyebrow">村属学校 · 校内门户</div>
+      <div class="school-head">
+        <div class="school-badge">石浦岙育红小学</div>
+        <h3>石浦岙育红小学校园网</h3>
+        <div class="school-motto">读书识字 · 沿海育人 · 校址：村东头老晒场北侧平房</div>
+      </div>
+
+      <nav class="school-nav" aria-label="校园栏目">
+        <button type="button" class="active" data-view="schoolHome">学校概况</button>
+        <button type="button" data-view="schoolNews">校内动态</button>
+        <button type="button" data-view="schoolStaff">教职工名录</button>
+        <button type="button" data-view="schoolClass">班级与作息</button>
+        <button type="button" data-view="schoolPhoto">校园旧影</button>
+      </nav>
+
+      <!-- 学校概况 -->
+      <div class="school-view on" id="schoolHome">
+        <div class="school-grid">
+          <div class="school-card">
+            <h4>学校简介</h4>
+            <p>石浦岙育红小学为村办完小，开办于上世纪七十年代，校舍为村东头一排石墙木瓦平房，门前是一小片夯土操场。学校招收本村及邻近滩涂一带的适龄儿童，开设一至四年级，高年级学生需到镇中心小学就读。</p>
+            <p class="meta">现任负责人：代课教师 林老师 · 在校学生三十余人</p>
+          </div>
+          <div class="school-card">
+            <h4>办学概况</h4>
+            <p>学校开设语文、算术、常识、体育与劳动等课程；课余组织学生整理晒场、修补渔具、参与滩涂小种养。逢潮汛与农忙，学生随家中长辈出海或下地，到校人数时有增减。</p>
+            <p class="meta">教学用房：平房三间 · 教具：旧黑板、粉笔、少量挂图</p>
+          </div>
+        </div>
+        <figure class="school-figure">
+          <img src="assets/school-old.jpg" alt="育红小学旧校舍">
+          <figcaption>早年留存的校舍旧照，操场与旧旗杆均已翻修过多次。</figcaption>
+        </figure>
+      </div>
+
+      <!-- 校内动态 -->
+      <div class="school-view" id="schoolNews">
+        <ul class="school-news" id="schoolNewsList">
+          <li data-id="n1">
+            <div class="t">秋季开学报名登记，适龄儿童可到学校平房办理入学</div>
+            <div class="m">2026-09-01 · 学校教务处</div>
+          </li>
+          <li data-id="n2">
+            <div class="t">旧教室屋顶漏雨，已报村委会登记修缮，雨天注意绕行</div>
+            <div class="m">2026-08-30 · 学校值班室</div>
+          </li>
+          <li data-id="n3">
+            <div class="t">组织学生到龙王滩一带开展劳动实践，捡拾滩涂杂物</div>
+            <div class="m">2026-06-18 · 少先队中队</div>
+          </li>
+          <li data-id="n5">
+            <div class="t">春风催新绿，我校开展“3·12”植树节主题活动</div>
+            <div class="m">2026-03-12 · 少先队中队</div>
+          </li>
+          <li data-id="n4">
+            <div class="t">春季学期期末考试结束，成绩单由班主任逐户送到家中</div>
+            <div class="m">2026-01-15 · 学校教务处</div>
+          </li>
+          <li data-id="n6">
+            <div class="t">国庆长假作业布置及要求</div>
+            <div class="m">2025-10-01 · 学校教务处</div>
+          </li>
+          <li data-id="n7">
+            <div class="t">2025年国庆节放假及延期安排通知</div>
+            <div class="m">2025-09-28 · 校长办公室</div>
+          </li>
+          <li data-id="n8">
+            <div class="t">三年级优秀作文周记选登 《梦想》</div>
+            <div class="m">2025-05-20 · 语文组</div>
+          </li>
+        </ul>
+
+        <!-- 动态详情 -->
+        <div class="school-detail" id="schoolDetail" hidden>
+          <a class="case-back" href="javascript:void(0)" id="schoolDetailBack">← 返回校内动态</a>
+          <h3 class="school-detail-title" id="schoolDetailTitle"></h3>
+          <div class="case-meta" id="schoolDetailMeta"></div>
+          <div class="case-meta" id="schoolDetailByline" hidden></div>
+          <div class="case-body" id="schoolDetailBody"></div>
+          <div id="schoolDetailTable"></div>
+          <figure class="school-figure" id="schoolDetailFigure" hidden>
+            <img id="schoolDetailImg" src="" alt="活动配图">
+          </figure>
+        </div>
+      </div>
+
+      <!-- 教职工名录 -->
+      <div class="school-view" id="schoolStaff">
+        <table class="school-table">
+          <colgroup><col style="width:22%"><col style="width:20%"><col style="width:30%"><col style="width:28%"></colgroup>
+          <thead>
+            <tr><th>姓名</th><th>职务</th><th>任教科目</th><th>备注</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>林秀兰</td><td>代课教师</td><td>语文 · 算术</td><td>主持校内日常事务</td></tr>
+            <tr><td>周阿福</td><td>代课教师</td><td>常识 · 体育</td><td>兼管操场与教具</td></tr>
+            <tr><td>陈守义</td><td>民办教师</td><td>算术 · 劳动</td><td>本村人，课余帮修校舍</td></tr>
+            <tr><td>王桂英</td><td>代课教师</td><td>语文 · 音乐</td><td>兼管学生点名册</td></tr>
+          </tbody>
+        </table>
+        <p class="sign-note">注：学校教师多为代课与民办身份，人员随学年有所调整。</p>
+      </div>
+
+      <!-- 班级与作息 -->
+      <div class="school-view" id="schoolClass">
+        <table class="school-table">
+          <colgroup><col style="width:18%"><col style="width:20%"><col style="width:22%"><col style="width:40%"></colgroup>
+          <thead>
+            <tr><th>班级</th><th>班主任</th><th>在校人数</th><th>主要课程</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>一年级</td><td>王桂英</td><td class="center"><a class="count-link" href="javascript:void(0)" data-class="c1">16 人</a></td><td>识字 · 算术入门</td></tr>
+            <tr><td>二年级</td><td>林秀兰</td><td class="center"><a class="count-link" href="javascript:void(0)" data-class="c2">18 人</a></td><td>语文 · 算术</td></tr>
+            <tr><td>三年级</td><td>陈守义</td><td class="center"><a class="count-link" href="javascript:void(0)" data-class="c3">17 人</a></td><td>语文 · 算术 · 常识</td></tr>
+            <tr><td>四年级</td><td>周阿福</td><td class="center"><a class="count-link" href="javascript:void(0)" data-class="c4">15 人</a></td><td>算术 · 常识 · 体育</td></tr>
+          </tbody>
+        </table>
+        <p class="sign-note">作息：上午 8:00 到校，11:30 放学；下午 13:30 到校，16:00 放学。</p>
+
+        <!-- 学生名册详情 -->
+        <div class="school-detail" id="classRoster" hidden>
+          <a class="case-back" href="javascript:void(0)" id="classRosterBack">← 返回班级与作息</a>
+          <h3 class="school-detail-title" id="classRosterTitle"></h3>
+          <div class="case-meta" id="classRosterMeta"></div>
+          <table class="school-table" id="classRosterTable">
+            <colgroup><col style="width:26%"><col style="width:18%"><col style="width:18%"><col style="width:38%"></colgroup>
+            <thead><tr><th>姓名</th><th>性别</th><th>年龄</th><th>在校状态</th></tr></thead>
+            <tbody id="classRosterBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 校园旧影 -->
+      <div class="school-view" id="schoolPhoto">
+        <figure class="school-figure">
+          <img src="assets/school-old.jpg" alt="育红小学旧校舍">
+          <figcaption>校门前的夯土操场与旧旗杆，早年学生多在此列队、做操。</figcaption>
+        </figure>
+        <p class="case-body" style="margin-top:14px">校内留存的旧照片不多，多为往届学生毕业时在平房前合影；因年代久远，相片已褪色模糊，人脸多已辨认不清。</p>
+      </div>
+
+      <p class="case-foot">本页为村办学校校内信息摘录，仅供本村乡亲查阅；招生与教学安排以学校当面通知为准。</p>
+      <a class="case-back" href="#home" id="schoolBack">返回村网首页</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 客服浮窗 ===== -->
+<button class="cs-fab" id="csFab" aria-label="联系客服" aria-expanded="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8A8.5 8.5 0 0 1 12.5 3 8.38 8.38 0 0 1 21 11.5z"/>
+  </svg>
+</button>
+<div class="cs-panel" id="csPanel" role="dialog" aria-label="客服对话">
+  <div class="cs-head">
+    <span class="title">村务咨询</span>
+    <button class="close" id="csClose" aria-label="关闭客服">×</button>
+  </div>
+  <div class="cs-body" id="csBody">
+    <div class="cs-msg bot">您好，这里是石浦岙村村务咨询，有什么可以帮您？<span class="cs-time">值班时间：逢农历双日上午</span></div>
+  </div>
+  <div class="cs-input">
+    <input type="text" id="csText" placeholder="输入咨询内容…" autocomplete="off">
+    <button type="button" id="csSend">发送</button>
+  </div>
+</div>
+
+<!-- ===== 页脚 ===== -->
+<footer class="site">
+  <div class="wrap footer-inner">
+    <div>© 2026 石浦岙村村网 · 本站为村内门户示意页面</div>
+    <div class="links">
+      <a href="走进石浦岙村.html">走进石浦岙村</a>
+      <a href="村公告栏.html">公告</a>
+      <a href="本地新闻.html">本地新闻</a>
+      <a href="村史图库.html">图库</a>
+      <a href="便民服务.html">便民服务</a>
+      <a href="留言板.html">留言板</a>
+      <a href="联系我们.html">联系我们</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ===== 站内搜索 =====
+     普通关键词：在公告 / 新闻 / 图库中本地过滤。
+     线索关键词调出对应隐藏页（导航、页脚均不提供入口，默认隐藏）：
+     拆迁安置细则 / 安置细则 / 签约 → 拆迁安置细则与签约表。 */
+  (function(){
+    var form=document.getElementById('searchForm');
+    var input=document.getElementById('searchInput');
+    var hiddenRule=document.getElementById('hiddenRule');
+    var hiddenRescue=document.getElementById('hiddenRescue');
+    var hiddenSchool=document.getElementById('hiddenSchool');
+    var homeView=document.querySelector('main.wrap');
+
+    var RULE_TRIGGER=['拆迁安置细则','安置细则','签约表','签约登记'];
+    var RESCUE_TRIGGER=['陈寿'];
+    var SCHOOL_TRIGGER=['育红小学','石浦岙育红小学','小学','学校','校园'];
+
+    var groups=[
+      {root:document.getElementById('noticeList'), items:document.querySelectorAll('#noticeList li'), hint:document.getElementById('noticeHint')},
+      {root:document.getElementById('newsList'), items:document.querySelectorAll('#newsList .news-item'), hint:document.getElementById('newsHint')},
+      {root:document.getElementById('gallery'), items:document.querySelectorAll('#gallery .figure'), hint:document.getElementById('galleryHint')}
+    ];
+
+    /* 签约名单：仅陈寿未签约，置于靠后不起眼位置 */
+    var SURNAMES=['王','李','张','刘','陈','杨','赵','黄','周','吴','徐','孙','胡','朱','高','林','何','郭','马','罗','梁','宋','郑','谢','韩','唐','冯','于','董','萧','程','曹','袁','邓','许','傅','沈','曾','彭','吕','苏','卢','蒋','蔡','贾','丁','魏','薛','叶','阎','余','潘','杜','戴','夏','钟','汪','田','任','姜','范','方','石','姚','谭','廖','邹','熊','金','陆','郝','孔','白','崔','康','毛','邱','秦','江','史','顾','侯','邵','孟','龙','万','段','雷','钱','汤','尹','黎','易','常','武','乔','贺','赖','龚','文'];
+    var MALE=['长根','德海','满仓','国强','炳文','德顺','守义','金生','永年','宝林','广田','庆丰','志远','洪涛','家驹','国栋','立群','春生','书恒','绍安'];
+    var FEMALE=['阿妹','桂英','秀莲','玉芬','巧云','招娣','淑珍','凤兰','惠兰','翠萍','雅琴','兰芳','月娥','素梅','爱华','静怡','婉清','念慈','雪梅','红英'];
+    var SIGN_ROWS=[];
+    var maleCount=54, femaleCount=54;
+    for(var i=0;i<maleCount;i++){
+      var sn=SURNAMES[i%SURNAMES.length];
+      SIGN_ROWS.push([sn+MALE[i%MALE.length],'男',true]);
+    }
+    for(var j=0;j<femaleCount;j++){
+      var sn2=SURNAMES[(j+37)%SURNAMES.length];
+      SIGN_ROWS.push([sn2+FEMALE[j%FEMALE.length],'女',true]);
+    }
+    /* 陈寿：男性，未签约，插入到靠后位置 */
+    SIGN_ROWS.splice(91,0,['陈寿','男',false]);
+
+    var PAGE_SIZE=12, signPage=1;
+    function renderSignTable(){
+      var body=document.getElementById('signBody');
+      var pager=document.getElementById('signPager');
+      if(!body)return;
+      var total=SIGN_ROWS.length;
+      var pages=Math.ceil(total/PAGE_SIZE);
+      if(signPage>pages)signPage=pages;
+      var start=(signPage-1)*PAGE_SIZE;
+      var rows=SIGN_ROWS.slice(start,start+PAGE_SIZE);
+      body.innerHTML=rows.map(function(r,k){
+        var idx=start+k+1;
+        var tick=r[2]?'<span class="tick">√</span>':'<span class="blank">—</span>';
+        return '<tr><td>'+idx+'</td><td class="name">'+r[0]+'</td><td>'+r[1]+'</td><td>'+tick+'</td></tr>';
+      }).join('');
+      /* 分页按钮 */
+      var btns='';
+      btns+='<button data-p="prev" '+(signPage<=1?'disabled':'')+'>上一页</button>';
+      for(var p=1;p<=pages;p++){
+        btns+='<button data-p="'+p+'" class="'+(p===signPage?'active':'')+'">'+p+'</button>';
+      }
+      btns+='<button data-p="next" '+(signPage>=pages?'disabled':'')+'>下一页</button>';
+      btns+='<span class="page-info">第 '+signPage+' / '+pages+' 页 · 共 '+total+' 人</span>';
+      pager.innerHTML=btns;
+      Array.prototype.forEach.call(pager.querySelectorAll('button'),function(btn){
+        btn.addEventListener('click',function(){
+          var v=btn.getAttribute('data-p');
+          if(v==='prev')signPage=Math.max(1,signPage-1);
+          else if(v==='next')signPage=Math.min(pages,signPage+1);
+          else signPage=parseInt(v,10);
+          renderSignTable();
+        });
+      });
+    }
+
+    function hideAll(){
+      [hiddenRule,hiddenRescue,hiddenSchool].forEach(function(p){
+        p.classList.remove('on');
+        p.setAttribute('aria-hidden','true');
+      });
+      homeView.style.display='';
+    }
+
+    function resetAll(){
+      hideAll();
+      groups.forEach(function(g){
+        g.items.forEach(function(it){it.style.display='';});
+        g.hint.textContent='';
+      });
+    }
+
+    function openPanel(panel){
+      hideAll();
+      panel.classList.add('on');
+      panel.setAttribute('aria-hidden','false');
+      homeView.style.display='none';
+      groups.forEach(function(g){g.hint.textContent='';});
+      panel.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+
+    function hitsAny(q,list){
+      var kw=q.toLowerCase();
+      return list.some(function(t){return kw.indexOf(t.toLowerCase())>-1;});
+    }
+
+    function search(){
+      var q=input.value.trim();
+      if(!q){resetAll();return;}
+      if(hitsAny(q,RULE_TRIGGER)){renderSignTable();openPanel(hiddenRule);return;}
+      if(hitsAny(q,RESCUE_TRIGGER)){openPanel(hiddenRescue);return;}
+      if(hitsAny(q,SCHOOL_TRIGGER)){openPanel(hiddenSchool);return;}
+
+      /* 常规过滤 */
+      hideAll();
+      var kw=q.toLowerCase();
+      groups.forEach(function(g){
+        var hit=0;
+        g.items.forEach(function(it){
+          var match=it.textContent.toLowerCase().indexOf(kw)>-1;
+          it.style.display=match?'':'none';
+          if(match)hit++;
+        });
+        g.hint.textContent=hit>0?('命中 '+hit+' 条与“'+q+'”相关的内容'):('未找到与“'+q+'”相关的内容');
+      });
+    }
+
+    form.addEventListener('submit',function(e){e.preventDefault();search();});
+    input.addEventListener('input',function(){if(!input.value.trim())resetAll();});
+
+    /* 从隐藏页返回首页时复位检索状态 */
+    document.getElementById('ruleBack').addEventListener('click',function(){
+      resetAll();input.value='';
+    });
+    document.getElementById('rescueBack').addEventListener('click',function(){
+      resetAll();input.value='';
+    });
+    document.getElementById('schoolBack').addEventListener('click',function(){
+      resetAll();input.value='';closeSchoolDetail();closeRoster();
+    });
+
+    /* 校园网栏目切换 */
+    var schoolNav=hiddenSchool.querySelectorAll('.school-nav button');
+    Array.prototype.forEach.call(schoolNav,function(btn){
+      btn.addEventListener('click',function(){
+        Array.prototype.forEach.call(schoolNav,function(b){b.classList.remove('active');});
+        btn.classList.add('active');
+        var target=btn.getAttribute('data-view');
+        Array.prototype.forEach.call(hiddenSchool.querySelectorAll('.school-view'),function(v){
+          v.classList.toggle('on',v.id===target);
+        });
+        if(target!=='schoolNews'){closeSchoolDetail();}
+        if(target!=='schoolClass'){closeRoster();}
+      });
+    });
+
+    /* 校内动态详情 */
+    var SCHOOL_NEWS={
+      n1:{
+        title:'秋季开学报名登记，适龄儿童可到学校平房办理入学',
+        meta:'2026-09-01 · 学校教务处',
+        body:[
+          '秋季学期定于九月一日起报名，凡本村年满六周岁、尚未入学的儿童，由家长携带户口簿到村东头学校平房登记，领取课本与点名册。',
+          '报名时间为逢双日上午八点至十一点半，雨天顺延。一年级新生由班主任王桂英老师接待；插班转入的学生，需先到教务处核对原有年级与学业情况。',
+          '因校舍有限，各班人数按登记先后安排；家庭困难的学生可向学校说明，课本费酌情减免。报名后请按通知日期准时到校，开学当日举行简短的列队点名。'
+        ]
+      },
+      n2:{
+        title:'旧教室屋顶漏雨，已报村委会登记修缮，雨天注意绕行',
+        meta:'2026-08-30 · 学校值班室',
+        body:[
+          '近期连降秋雨，学校西侧一间旧教室屋顶出现多处漏雨，地面与墙角受潮，部分墙面灰皮剥落。学校已将情况登记上报村委会，等待安排木料与瓦片修缮。',
+          '修缮完成前，该教室暂停使用，相关班级临时合并到东侧两间平房上课。雨天经过西侧平房时请绕行，不要在屋檐下逗留，以免瓦片脱落或积水滑倒。',
+          '如发现屋顶继续漏雨或墙体开裂，可到学校值班室告知周阿福老师；修缮期间学生上下学由班主任在门口整队，统一安排进出路线。'
+        ]
+      },
+      n3:{
+        title:'组织学生到龙王滩一带开展劳动实践，捡拾滩涂杂物',
+        meta:'2026-06-18 · 少先队中队',
+        body:[
+          '六月十八日下午，三、四年级学生在老师带领下，到村西头龙王滩一带开展劳动实践，捡拾滩涂上的塑料杂物、废弃渔网与碎木片，集中装筐后运回晒场统一堆放处理。',
+          '活动前由周阿福老师讲解潮汛与滩涂安全：不得单独下水，不得越过堤坝，涨潮前必须返回岸边。学生按两人一组结伴行动，班主任沿途清点人数。',
+          '此次劳动既清理了滩涂，也让学生熟悉近海环境与种养规矩。捡拾到的旧渔具由渔业小组回收修补，杂物则按村委会指定地点填埋。活动结束后各班在操场集合，清点人数后放学。'
+        ]
+      },
+      n4:{
+        title:'春季学期期末考试结束，成绩单由班主任逐户送到家中',
+        meta:'2026-01-15 · 学校教务处',
+        body:[
+          '春季学期期末考试已于一月中旬结束，语文、算术与常识三科成绩已评定完毕。考虑到村中部分学生家长出海或下地不便到校，成绩单由各班班主任逐户送到家中，并当面说明学生在校表现。',
+          '成绩单上记有各科成绩、出勤情况与教师评语；对成绩落后或缺勤较多的学生，班主任会与家长商定假期补习与返校安排。',
+          '寒假期间学生应协助家中劳作，注意用火、用电与近海安全；开学时间以学校后续通知为准。家长如对成绩有疑问，可在逢双日上午到学校平房向班主任询问。'
+        ]
+      },
+      n5:{
+        title:'春风催新绿，我校开展“3·12”植树节主题活动',
+        meta:'2026-03-12 · 少先队中队',
+        img:'assets/school-tree.jpg',
+        body:[
+          '春回大地，万物复苏。3月12日植树节当天，石浦岙育红小学组织开展了“建绿色校园，树环保理念”主题植树活动。各班级学生在老师的带领下，在校园操场边缘种下了一排排小树苗。',
+          '活动中，三年级的陈老师向同学们讲述了石浦岙村老一辈“插枝种养”的传统民俗：“咱们村以前有个老习惯，遇到断了的树枝，不是扔了，而是插在土里，只要土够肥，过些日子就能长出新芽。种树也是一样，要用心呵护，才能生根发芽。”这番话让同学们对生命的力量有了更深的感悟。',
+          '活动结束后，各班给种下的树苗挂上写有班级与日期的小木牌，约定日后返校时查看长势。'
+        ]
+      },
+      n6:{
+        title:'国庆长假作业布置及要求',
+        meta:'2025-10-01 · 学校教务处',
+        body:[
+          '国庆长假期间，各班按年级布置相应作业，由班主任在节前通知到学生与家长。作业应在假期内完成，开学首日由任课教师统一收缴检查。',
+          '各年级科目与具体要求如下表所示，请家长督促孩子按时完成，注意书写工整、按时作息。'
+        ],
+        table:
+          '<table class="school-table">'
+          +'<colgroup><col style="width:16%"><col style="width:18%"><col style="width:66%"></colgroup>'
+          +'<thead><tr><th>年级</th><th>科目</th><th>作业内容与要求</th></tr></thead>'
+          +'<tbody>'
+          +'<tr><td>一年级</td><td>算术</td><td>练习 20 以内加减法口算，每日一页，共十页；完成算术练习册中对应的看图数数与比较大小题目；书写数字 0 到 20 各一行，要求笔顺整齐。</td></tr>'
+          +'<tr><td>二年级</td><td>语文</td><td>抄写课本生字表中本单元生字，每个字三遍并组一个词；朗读课文两篇，家长在课文后签名。</td></tr>'
+          +'<tr><td>二年级</td><td>算术</td><td>完成两位数加减竖式计算练习二十道；背诵乘法口诀表前四句，开学后抽查。</td></tr>'
+          +'<tr><td>三年级</td><td>语文</td><td>默写本学期要求背诵的古诗两首；完成一篇周记，记录假期里帮家里干活或下地、出海所见，不少于三百字。</td></tr>'
+          +'<tr><td>三年级</td><td>算术</td><td>完成乘除法混合运算练习三十道；解答两步计算应用题四道，要求写出算式与答语。</td></tr>'
+          +'<tr><td>四年级</td><td>语文</td><td>以《我的父亲》为题写一篇作文，记叙父亲在家务农、出海或做工中的一件事，写出人物样子与自己的感受，不少于四百字，开学后全班讲评。</td></tr>'
+          +'<tr><td>四年级</td><td>算术</td><td>完成四则混合运算练习二十五道；预习课本中面积与周长部分，试做课后习题；整理本学期错题，开学上交核对。</td></tr>'
+          +'</tbody></table>'
+      },
+      n7:{
+        title:'2025年国庆节放假及延期安排通知',
+        meta:'2025-09-28 · 校长办公室',
+        body:[
+          '全体师生、各位家长：根据国家法定节假日安排，结合我校实际，现将2025年国庆节放假事宜通知如下：',
+          '原定于10月1日至10月7日的国庆假期，因近期我县及周边区域地震活动频发，且伴有短时强降雨，出于对全体师生生命安全的考虑，经上级教育局批准，本次假期延期至10月10日（周五），10月11日（周六）正常补课。',
+          '假期期间，请各位家长务必看管好孩子，严禁私自前往沿海滩涂、水库及后山区域游玩。如遇突发地震，请保持冷静，就近避险。'
+        ]
+      },
+      n8:{
+        title:'三年级优秀作文周记选登 《梦想》',
+        meta:'2025-05-20 · 语文组',
+        byline:'作者：汪美玲 · 指导老师：王老师',
+        body:[
+          '我的爷爷，夏天再热他也穿长袖。有一次他换衣服，我看到他胳膊上有一颗米粒样的疙瘩，硬硬的。我问爷爷这是不是青春痘，爷爷把袖子拉下来，笑了笑说我傻。',
+          '有天，我和奶奶上山挖竹笋，山后的庄稼里有颗奇怪的萝卜，上面也长着疙瘩，奶奶说萝卜生病了，我说爷爷是不是也生病了？奶奶摸摸我的头，笑了笑说我傻。',
+          '我以后一定要成为一名医生，把爷爷的疙瘩治好。'
+        ]
+      }
+    };
+    var newsList=document.getElementById('schoolNewsList');
+    var schoolDetail=document.getElementById('schoolDetail');
+    var schoolDetailTitle=document.getElementById('schoolDetailTitle');
+    var schoolDetailMeta=document.getElementById('schoolDetailMeta');
+    var schoolDetailByline=document.getElementById('schoolDetailByline');
+    var schoolDetailBody=document.getElementById('schoolDetailBody');
+    var schoolDetailTable=document.getElementById('schoolDetailTable');
+    var schoolDetailFigure=document.getElementById('schoolDetailFigure');
+    var schoolDetailImg=document.getElementById('schoolDetailImg');
+    function openSchoolDetail(id){
+      var item=SCHOOL_NEWS[id];
+      if(!item)return;
+      schoolDetailTitle.textContent=item.title;
+      schoolDetailMeta.textContent=item.meta;
+      if(item.byline){schoolDetailByline.textContent=item.byline;schoolDetailByline.hidden=false;}
+      else{schoolDetailByline.hidden=true;}
+      schoolDetailBody.innerHTML=item.body.map(function(p){return '<p>'+p+'</p>';}).join('');
+      schoolDetailTable.innerHTML=item.table||'';
+      if(item.img){schoolDetailImg.src=item.img;schoolDetailFigure.hidden=false;}
+      else{schoolDetailFigure.hidden=true;}
+      newsList.hidden=true;
+      schoolDetail.hidden=false;
+      schoolDetail.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function closeSchoolDetail(){
+      schoolDetail.hidden=true;
+      newsList.hidden=false;
+    }
+    Array.prototype.forEach.call(newsList.querySelectorAll('li'),function(li){
+      li.addEventListener('click',function(){openSchoolDetail(li.getAttribute('data-id'));});
+    });
+    document.getElementById('schoolDetailBack').addEventListener('click',function(e){
+      e.preventDefault();closeSchoolDetail();
+    });
+
+    /* ===== 班级学生名册 ===== */
+    var ROSTER={
+      c1:{
+        title:'一年级 · 学生名册', meta:'班主任：王桂英 · 共 16 人',
+        students:[
+          ['李小梅','女','7','在校'],['王铁柱','男','7','在校'],['陈招娣','女','7','在校'],['张金根','男','6','在校'],
+          ['刘巧云','女','7','在校'],['杨来福','男','7','在校'],['黄阿妹','女','6','在校'],['赵德海','男','7','在校'],
+          ['周秀花','女','7','在校'],['吴宝山','男','7','在校'],['徐桂兰','女','6','在校'],['孙金生','男','7','在校'],
+          ['胡玉芬','女','7','在校'],['朱守田','男','6','在校'],['林爱华','女','7','在校'],['何满仓','男','7','在校']
+        ]
+      },
+      c2:{
+        title:'二年级 · 学生名册', meta:'班主任：林秀兰 · 共 18 人',
+        students:[
+          ['王桂英','女','8','在校'],['李炳文','男','8','在校'],['张秀莲','女','8','在校'],['刘国强','男','8','在校'],
+          ['陈玉芬','女','9','在校'],['杨德顺','男','8','在校'],['赵淑珍','女','8','在校'],['黄守义','男','9','在校'],
+          ['周凤兰','女','8','在校'],['吴金生','男','8','在校'],['徐惠兰','女','8','在校'],['孙永年','男','9','在校'],
+          ['胡翠萍','女','8','在校'],['朱宝林','男','8','在校'],['林雅琴','女','9','在校'],['何广田','男','8','在校'],
+          ['罗兰芳','女','8','在校'],['宋庆丰','男','9','在校']
+        ]
+      },
+      c3:{
+        title:'三年级 · 学生名册', meta:'班主任：陈守义 · 共 17 人',
+        students:[
+          ['郑月娥','女','10','在校'],['王志远','男','10','在校'],['冯素梅','女','10','在校'],['韩洪涛','男','11','在校'],
+          ['曹爱华','女','10','在校'],['唐家驹','男','10','在校'],['袁静怡','女','11','在校'],['邓国栋','男','10','在校'],
+          ['傅婉清','女','10','在校'],['许立群','男','11','在校'],['沈念慈','女','10','在校'],['曾春生','男','10','在校'],
+          ['彭雪梅','女','11','在校'],['吕书恒','男','10','在校'],['苏红英','女','10','在校'],['卢绍安','男','11','在校'],
+          ['蒋春花','女','10','在校']
+        ]
+      },
+      c4:{
+        title:'四年级 · 学生名册', meta:'班主任：周阿福 · 共 15 人',
+        students:[
+          ['蔡文轩','男','12','在校'],['贾桂芳','女','12','在校'],['丁志远','男','12','在校'],['魏玉婷','女','13','在校'],
+          ['薛国平','男','12','在校'],['叶秀珍','女','12','在校'],['阎守山','男','13','在校'],['余惠敏','女','12','在校'],
+          ['潘金波','男','12','在校'],['杜凤霞','女','13','在校'],['戴长根','男','12','在校'],['夏秀云','女','12','在校'],
+          ['钟海生','男','13','在校'],['汪美玲','女','12','在校'],['陈小小','女','13','开除学籍']
+        ]
+      }
+    };
+    var classRoster=document.getElementById('classRoster');
+    var classRosterTitle=document.getElementById('classRosterTitle');
+    var classRosterMeta=document.getElementById('classRosterMeta');
+    var classRosterBody=document.getElementById('classRosterBody');
+    function openRoster(key){
+      var r=ROSTER[key];
+      if(!r)return;
+      classRosterTitle.textContent=r.title;
+      classRosterMeta.textContent=r.meta;
+      classRosterBody.innerHTML=r.students.map(function(s){
+        var st=s[3];
+        var cls=st==='开除学籍'?'expel':(st==='休学'?'leave':'');
+        return '<tr><td>'+s[0]+'</td><td class="center">'+s[1]+'</td><td class="center">'+s[2]+'</td><td class="roster-status '+cls+'">'+st+'</td></tr>';
+      }).join('');
+      classRoster.hidden=false;
+      classRoster.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function closeRoster(){classRoster.hidden=true;}
+    Array.prototype.forEach.call(document.querySelectorAll('.count-link'),function(a){
+      a.addEventListener('click',function(e){e.preventDefault();openRoster(a.getAttribute('data-class'));});
+    });
+    document.getElementById('classRosterBack').addEventListener('click',function(e){
+      e.preventDefault();closeRoster();
+    });
+
+    /* ===== 留言板：本地追加，刷新后不保留 ===== */
+    var boardForm=document.getElementById('boardForm');
+    var boardList=document.getElementById('boardList');
+    var boardHint=document.getElementById('boardHint');
+    boardForm.addEventListener('submit',function(e){
+      e.preventDefault();
+      var name=document.getElementById('boardName').value.trim();
+      var text=document.getElementById('boardText').value.trim();
+      if(!text){boardHint.textContent='留言内容不能为空';return;}
+      var li=document.createElement('li');
+      var who=document.createElement('div');
+      who.className='who';
+      var now=new Date();
+      var stamp=(now.getMonth()+1)+'-'+now.getDate();
+      who.textContent=name||'匿名村民';
+      var time=document.createElement('span');
+      time.className='time';
+      time.textContent=stamp;
+      who.appendChild(time);
+      var msg=document.createElement('div');
+      msg.className='msg';
+      msg.textContent=text;
+      li.appendChild(who);
+      li.appendChild(msg);
+      boardList.insertBefore(li,boardList.firstChild);
+      boardForm.reset();
+      boardHint.textContent='留言已提交（本地演示，刷新后不保留）';
+    });
+
+    /* ===== 客服浮窗：本地演示，自动回复占位 ===== */
+    var csFab=document.getElementById('csFab');
+    var csPanel=document.getElementById('csPanel');
+    var csClose=document.getElementById('csClose');
+    var csBody=document.getElementById('csBody');
+    var csText=document.getElementById('csText');
+    var csSend=document.getElementById('csSend');
+
+    function togglePanel(open){
+      csPanel.classList.toggle('open',open);
+      csFab.setAttribute('aria-expanded',open?'true':'false');
+    }
+    csFab.addEventListener('click',function(){togglePanel(!csPanel.classList.contains('open'));});
+    csClose.addEventListener('click',function(){togglePanel(false);});
+
+    function nowStamp(){
+      var d=new Date();
+      return (d.getHours()<10?'0':'')+d.getHours()+':'+(d.getMinutes()<10?'0':'')+d.getMinutes();
+    }
+    function addMsg(text,who){
+      var el=document.createElement('div');
+      el.className='cs-msg '+who;
+      el.innerHTML='';
+      el.appendChild(document.createTextNode(text));
+      var t=document.createElement('span');
+      t.className='cs-time';
+      t.textContent=nowStamp();
+      el.appendChild(t);
+      csBody.appendChild(el);
+      csBody.scrollTop=csBody.scrollHeight;
+    }
+    function sendCs(){
+      var text=csText.value.trim();
+      if(!text)return;
+      addMsg(text,'user');
+      csText.value='';
+      /* 关键词指令：索要内部病例调查简报 PDF 时返回删除提示 */
+      var kw=text.toLowerCase();
+      var hitFile=kw.indexOf('内部病例调查简报')>-1||(kw.indexOf('病例')>-1&&kw.indexOf('简报')>-1)||(kw.indexOf('.pdf')>-1&&kw.indexOf('病例')>-1);
+      setTimeout(function(){
+        if(hitFile){
+          addMsg('该文件已被管理员删除，若查看请在管理员主页查询。','bot');
+          setTimeout(function(){
+            addMsg('管理员主页请通过：首页—便民服务—在线查询—先输入管理员账号—再输入管理员后台进入。','bot');
+          },700);
+        }else{
+          addMsg('您的问题已记录，值班人员会在办公时间内回复；紧急事项可到村委会值班室登记。','bot');
+        }
+      },500);
+    }
+    csSend.addEventListener('click',sendCs);
+    csText.addEventListener('keydown',function(e){if(e.key==='Enter')sendCs();});
+  })();
+</script>
+</body>
+</html>

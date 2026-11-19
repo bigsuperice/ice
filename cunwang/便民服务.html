@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>便民服务 · 石浦岙村村网</title>
+<style>
+  :root{
+    --paper:#f1e9d6;
+    --paper-2:#e7dcc2;
+    --ink:#3a2f22;
+    --ink-soft:#5c4d38;
+    --line:#b9a67e;
+    --accent:#6d5a34;
+    --accent-soft:#8a7344;
+    --card:rgba(244,236,217,.92);
+    --shadow:0 2px 10px rgba(58,47,34,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+    color:var(--ink);background-color:#d8c9a3;line-height:1.7;
+  }
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  img{display:block;max-width:100%}
+
+  .bg-layer{
+    position:fixed;inset:0;z-index:-2;
+    background:url("assets/bg-village.jpg") center/cover no-repeat fixed;
+    filter:sepia(.28) saturate(.85) brightness(.92);
+  }
+  .bg-layer::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(58,47,34,.35) 0%,rgba(58,47,34,.18) 38%,rgba(216,201,163,.55) 100%);
+  }
+  .grain{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.18;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  header.site{background:rgba(58,47,34,.82);color:var(--paper);border-bottom:3px solid var(--accent-soft)}
+  .site-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0 12px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand svg{width:44px;height:44px;flex:none}
+  .brand h1{font-size:26px;letter-spacing:.18em;font-weight:700}
+  .brand .sub{font-size:13px;letter-spacing:.3em;color:#d9c9a2;margin-top:2px}
+
+  nav.main{border-top:1px solid rgba(217,201,162,.25)}
+  nav.main ul{display:flex;flex-wrap:wrap;gap:4px}
+  nav.main a{display:block;padding:12px 20px;font-size:15px;letter-spacing:.12em;color:#e7dcc2;border-bottom:2px solid transparent}
+  nav.main a:hover,nav.main a.active{color:#fff;border-bottom-color:var(--accent-soft);background:rgba(255,255,255,.06)}
+
+  .page-head{padding:44px 0 10px;color:#f6eed8}
+  .page-head .crumb{font-size:13px;letter-spacing:.15em;color:#e4d5ac;margin-bottom:10px}
+  .page-head .crumb a:hover{text-decoration:underline}
+  .page-head h2{font-size:30px;letter-spacing:.22em;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+  .page-head p{margin-top:10px;font-size:15px;letter-spacing:.12em;color:#e4d5ac;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+
+  section.block{margin:30px 0}
+  .panel{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);padding:24px 26px}
+  .panel h3{font-size:20px;letter-spacing:.18em;color:var(--ink);border-left:4px solid var(--accent-soft);padding-left:12px;margin-bottom:18px}
+  .panel h3 .meta{font-size:12px;color:var(--ink-soft);letter-spacing:.1em;margin-left:10px}
+
+  /* 服务卡片 */
+  .service-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .service-card{border:1px solid var(--line);background:var(--paper-2);padding:18px}
+  .service-card h4{font-size:16px;margin-bottom:8px;letter-spacing:.05em}
+  .service-card p{font-size:13px;color:var(--ink-soft)}
+  .service-card .service-meta{margin-top:10px;font-size:12px;color:var(--accent-soft);letter-spacing:.05em}
+
+  /* 独立在线查询（与主页站内搜索互不关联） */
+  .query-box{margin-top:6px}
+  .query-note{font-size:13px;color:var(--ink-soft);margin-bottom:14px}
+  .query-form{display:flex;gap:0;align-items:stretch;max-width:520px}
+  .query-form input{
+    flex:1;padding:10px 12px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);font-family:inherit;font-size:14px;outline:none;
+  }
+  .query-form button{
+    padding:10px 18px;border:1px solid var(--accent-soft);border-left:none;
+    background:var(--accent-soft);color:var(--paper);font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .query-form button:hover{background:var(--accent)}
+  .query-result{margin-top:16px;border-top:1px dashed var(--line);padding-top:14px;font-size:14px}
+  .query-result .q-hint{color:var(--ink-soft)}
+  .query-result .q-item{border:1px solid var(--line);background:rgba(244,236,217,.6);padding:14px 16px;margin-top:10px}
+  .query-result .q-item h5{font-size:15px;margin-bottom:6px}
+  .query-result .q-item p{font-size:13px;color:var(--ink-soft)}
+  .query-result .q-item .q-meta{margin-top:6px;font-size:12px;color:var(--accent-soft);letter-spacing:.05em}
+  .query-result .q-admin{border-color:var(--accent-soft);background:rgba(109,90,52,.08)}
+  .query-error{margin-top:12px;font-size:13px;color:var(--accent);border-left:3px solid var(--accent-soft);padding-left:12px}
+
+  /* 备份档案二次查询（输入值班室号码后展开的独立搜索框） */
+  .backup-wrap{margin-top:18px;border-top:1px dashed var(--line);padding-top:16px}
+  .backup-wrap h5{font-size:15px;letter-spacing:.08em;margin-bottom:6px}
+  .backup-wrap .backup-note{font-size:13px;color:var(--ink-soft);margin-bottom:12px}
+  .backup-form{display:flex;gap:0;align-items:stretch;max-width:520px}
+  .backup-form input{
+    flex:1;padding:10px 12px;border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);font-family:inherit;font-size:14px;outline:none;
+  }
+  .backup-form button{
+    padding:10px 18px;border:1px solid var(--accent-soft);border-left:none;
+    background:var(--accent-soft);color:var(--paper);font-family:inherit;font-size:14px;cursor:pointer;
+  }
+  .backup-form button:hover{background:var(--accent)}
+  .backup-result{margin-top:14px;font-size:13px;color:var(--ink-soft)}
+
+  /* 医院诊断说明（PDF 文书样式） */
+  .report-wrap{margin-top:18px}
+  .report-doc{
+    background:#fbf7ec;border:1px solid var(--line);box-shadow:var(--shadow);
+    padding:30px 32px;max-width:760px;position:relative;
+  }
+  .report-doc .report-head{text-align:center;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:18px}
+  .report-doc .report-head h4{font-size:19px;letter-spacing:.12em}
+  .report-doc .report-head .report-sub{font-size:13px;color:var(--ink-soft);margin-top:6px;letter-spacing:.08em}
+  .report-doc .report-sec{margin:16px 0}
+  .report-doc .report-sec h6{font-size:14px;letter-spacing:.06em;margin-bottom:6px;color:var(--ink)}
+  .report-doc .report-sec p{font-size:13.5px;color:var(--ink-soft);line-height:1.8}
+  .report-doc .report-info{display:grid;grid-template-columns:repeat(2,1fr);gap:4px 24px;font-size:13.5px}
+  .report-doc .report-info div{padding:3px 0}
+  .report-doc .report-info b{color:var(--ink);font-weight:600}
+  .report-sign{margin-top:26px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13.5px}
+  .report-sign .line{padding-top:18px;border-top:1px dashed var(--line);min-width:220px}
+  .report-sign .sign-label{color:var(--ink-soft)}
+  .report-sign .sign-name{
+    display:inline-block;margin-left:6px;font-family:"Kaiti SC","STKaiti","KaiTi",cursive;
+    font-size:19px;font-weight:700;color:#2b2318;letter-spacing:.08em;
+  }
+  .report-stamp{
+    position:absolute;right:28px;bottom:20px;width:140px;height:140px;
+    opacity:.88;pointer-events:none;
+  }
+  .report-back{display:inline-block;margin-top:14px;font-size:13px;letter-spacing:.1em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+
+  /* 渔船与滩涂登记明细表 */
+  .register-wrap{margin-top:18px}
+  .register-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+  .register-table th,.register-table td{border:1px solid var(--line);padding:9px 10px;vertical-align:middle}
+  .register-table th{background:var(--paper-2);letter-spacing:.08em;color:var(--ink-soft)}
+  .register-table td.sign{font-weight:700}
+  .register-table tr.row-flag td{background:rgba(109,90,52,.1)}
+  .register-note{margin-top:10px;font-size:12px;color:var(--ink-soft);letter-spacing:.03em}
+  .register-back{display:inline-block;margin-top:14px;font-size:13px;letter-spacing:.1em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+
+  .back-link{display:inline-block;margin:10px 0 30px;font-size:14px;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+
+  footer.site{margin-top:40px;background:rgba(58,47,34,.82);color:var(--paper);border-top:3px solid var(--accent-soft)}
+  .footer-inner{display:flex;justify-content:space-between;gap:16px;padding:20px 0;flex-wrap:wrap;font-size:13px;color:#d9c9a2}
+  .footer-inner .links{display:flex;flex-wrap:wrap;gap:16px}
+  .footer-inner a:hover{text-decoration:underline}
+
+  @media(max-width:680px){
+    .service-grid{grid-template-columns:1fr}
+    .query-form{flex-direction:column;gap:8px}
+    .query-form button{border-left:1px solid var(--accent-soft)}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site">
+  <div class="wrap">
+    <div class="site-top">
+      <div class="brand">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="6" fill="#6d5a34"/>
+          <path d="M10 30h28l-4 7H14z" fill="#e7dcc2"/>
+          <path d="M24 12v13" stroke="#e7dcc2" stroke-width="2"/>
+          <path d="M24 14l9 8H24z" fill="#e7dcc2"/>
+          <path d="M8 39h32" stroke="#c9b887" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>石浦岙村</h1>
+          <div class="sub">沿海渔村 · 村务门户</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main" aria-label="主导航">
+      <ul>
+        <li><a href="index.html">首页</a></li>
+        <li><a href="走进石浦岙村.html">走进石浦岙村</a></li>
+        <li><a href="村公告栏.html">公告</a></li>
+        <li><a href="本地新闻.html">本地新闻</a></li>
+        <li><a href="村史图库.html">图库</a></li>
+        <li><a href="便民服务.html" class="active">便民服务</a></li>
+        <li><a href="留言板.html">留言板</a></li>
+        <li><a href="联系我们.html">联系我们</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="page-head">
+    <div class="crumb"><a href="index.html">首页</a> / 便民服务</div>
+    <h2>便民服务</h2>
+    <p>村内常用事项办理指引与在线查询</p>
+  </div>
+
+  <!-- ===== 在线查询（独立功能，与主页站内搜索互不关联） ===== -->
+  <section class="block">
+    <div class="panel">
+      <h3>在线查询 <span class="meta">村务办事 · 档案自查</span></h3>
+      <div class="query-box">
+        <p class="query-note">输入事项名称、户籍或姓名，可查询对应的办理流程与材料要求；本查询仅用于村内办事咨询，与首页站内搜索互不影响。</p>
+        <form class="query-form" id="queryForm" role="search">
+          <input type="text" id="queryInput" placeholder="如：合作医疗、居住证明、渔船登记…" aria-label="在线查询">
+          <button type="submit">查询</button>
+        </form>
+        <div class="query-result" id="queryResult"></div>
+
+        <!-- 备份档案二次查询：输入值班室号码后展开的独立搜索框 -->
+        <div class="backup-wrap" id="backupWrap" hidden>
+          <h5>备份档案查询</h5>
+          <p class="backup-note">请输入要查询的备份档案名称或编号。</p>
+          <form class="backup-form" id="backupForm" role="search">
+            <input type="text" id="backupInput" placeholder="搜索要查询的备份档案" aria-label="备份档案查询">
+            <button type="submit">查询</button>
+          </form>
+          <div class="backup-result" id="backupResult"></div>
+        </div>
+
+        <!-- 医院诊断说明：命中“内部病例调查简报.pdf”时展示 -->
+        <div class="report-wrap" id="reportWrap" hidden>
+          <div class="report-doc">
+            <div class="report-head">
+              <h4>县人民医院 · 普外科手术记录及病理分析报告</h4>
+              <div class="report-sub">医疗文书 · 编号 2025-1108-062</div>
+            </div>
+
+            <div class="report-sec">
+              <h6>【患者基本信息】</h6>
+              <div class="report-info">
+                <div><b>患者姓名：</b>王大海</div>
+                <div><b>性别：</b>男</div>
+                <div><b>年龄：</b>62 岁</div>
+                <div><b>家庭住址：</b>石浦岙村 3 组</div>
+                <div><b>入院时间：</b>2025 年 11 月 8 日</div>
+                <div><b>主诉症状：</b>剧烈腹痛、严重腹胀伴反复呕吐三天。</div>
+              </div>
+            </div>
+
+            <div class="report-sec">
+              <h6>【手术及探查记录】</h6>
+              <p><b>手术名称：</b>剖腹探查术 + 胃内异物切除术。</p>
+              <p style="margin-top:6px"><b>术中所见：</b>患者胃腔极度扩张。切开胃壁后，探查发现胃腔内存在一大小约 15cm×4cm 的异常增生物。该增生物呈白色肉状，质地坚韧，一端已与患者胃壁黏膜及血管网完全融合，建立独立血液循环；另一端突破胃壁，游离于腹腔。增生物远端已明显分化出人类手掌的骨骼关节形态，末节长有指甲。在切除过程中，该肢体结构仍存在轻微神经抽搐反应。</p>
+              <p style="margin-top:6px"><b>手术过程：</b>已完整切除该肢体结构（附带部分胃黏膜），患者目前转入 ICU 监护。</p>
+            </div>
+
+            <div class="report-sec">
+              <h6>【病理科初步分析】</h6>
+              <p>1. 经 DNA 比对，该肢体增生物的基因序列与患者王大海本人不符。</p>
+              <p>2. 样本表现出极端的端粒延长和细胞全能性。</p>
+              <p>3. 样本中检出高度同源的未知深海被囊动物门芽体干细胞特征。</p>
+              <p style="margin-top:6px"><b>结论：</b>疑似罕见寄生性异种畸胎瘤（待进一步检验）。</p>
+            </div>
+
+            <div class="report-sign">
+              <div class="line">主刀医生：<span class="sign-name">李建国</span></div>
+              <div class="line">病理科主任：<span class="sign-name">张强</span></div>
+            </div>
+
+            <svg class="report-stamp" viewBox="0 0 150 150" aria-hidden="true">
+              <defs>
+                <path id="stampArc" d="M75 75 m-55 0 a55 55 0 1 1 110 0 a55 55 0 1 1 -110 0"/>
+              </defs>
+              <circle cx="75" cy="75" r="70" fill="none" stroke="#a32620" stroke-width="3.4"/>
+              <circle cx="75" cy="75" r="64" fill="none" stroke="#a32620" stroke-width="1"/>
+              <path d="M75 50 l6.4 13 14.3 2.1 -10.4 10.1 2.5 14.2 -12.8 -6.7 -12.8 6.7 2.5 -14.2 -10.4 -10.1 14.3 -2.1 z"
+                    fill="#a32620"/>
+              <text fill="#a32620" font-size="17" letter-spacing="3" font-family="SimSun,serif" font-weight="700">
+                <textPath href="#stampArc" startOffset="50%" text-anchor="middle">滨海县人民医院医疗文书专用章滨海县人民医院医疗文书专用章</textPath>
+              </text>
+            </svg>
+          </div>
+          <a class="report-back" id="reportBack" href="javascript:void(0)">← 返回备份档案查询</a>
+        </div>
+      </div>
+
+      <!-- 渔船与滩涂登记明细（命中“渔船/滩涂登记”时切换显示） -->
+      <div class="register-wrap" id="registerWrap" hidden>
+        <h4 style="font-size:16px;letter-spacing:.1em;margin-bottom:6px">渔船与滩涂出海登记明细</h4>
+        <p class="register-note">记录区间：2025-10-01 至 2026-09-30，按日期由新到旧排列；下表为村内登记摘录。</p>
+        <table class="register-table">
+          <colgroup><col style="width:18%"><col style="width:22%"><col style="width:18%"><col style="width:42%"></colgroup>
+          <thead>
+            <tr><th>日期</th><th>出海记录</th><th>登船人数</th><th>登记人员签名</th></tr>
+          </thead>
+          <tbody id="registerBody">
+        <tr class=""><td>2026-09-30</td><td>近海拖网捕捞</td><td>2 人</td><td class="sign">李炳文、唐满仓</td></tr>
+        <tr class=""><td>2026-09-26</td><td>滩涂紫菜采收</td><td>4 人</td><td class="sign">王金生、程志远、刘炳文、唐永年</td></tr>
+        <tr class=""><td>2026-09-22</td><td>滩涂紫菜采收</td><td>4 人</td><td class="sign">罗德顺、谢宝林、杨阿根、孙永年</td></tr>
+        <tr class=""><td>2026-09-18</td><td>港湾护渔巡查</td><td>6 人</td><td class="sign">郭德顺、马春生、谢洪涛、程春生、赵春生、刘庆丰</td></tr>
+        <tr class=""><td>2026-09-14</td><td>滩涂捡螺挖蛤</td><td>3 人</td><td class="sign">赵阿贵、郭广田、黄炳文</td></tr>
+        <tr class=""><td>2026-09-10</td><td>出海收笼取渔获</td><td>5 人</td><td class="sign">陈庆丰、于庆丰、刘阿水、唐德顺、赵书恒</td></tr>
+        <tr class=""><td>2026-09-06</td><td>近海围网作业</td><td>2 人</td><td class="sign">曹志远、张永年</td></tr>
+        <tr class=""><td>2026-09-02</td><td>滩涂紫菜采收</td><td>6 人</td><td class="sign">徐满仓、于志远、周长根、陈书恒、马国强、林阿根</td></tr>
+        <tr class=""><td>2026-08-29</td><td>滩涂捡螺挖蛤</td><td>2 人</td><td class="sign">梁德顺、周长根</td></tr>
+        <tr class=""><td>2026-08-25</td><td>港湾护渔巡查</td><td>5 人</td><td class="sign">宋宝林、李广田、张志远、梁永年、唐德顺</td></tr>
+        <tr class=""><td>2026-08-21</td><td>出海收笼取渔获</td><td>4 人</td><td class="sign">徐庆丰、林春生、赵国强、冯绍安</td></tr>
+        <tr class=""><td>2026-08-17</td><td>近海围网作业</td><td>3 人</td><td class="sign">罗广田、罗长根、宋春生</td></tr>
+        <tr class=""><td>2026-08-13</td><td>港湾护渔巡查</td><td>4 人</td><td class="sign">周庆丰、赵阿水、徐永年、马宝林</td></tr>
+        <tr class=""><td>2026-08-09</td><td>出海收笼取渔获</td><td>6 人</td><td class="sign">李永年、陈宝林、马满仓、孙洪涛、唐书恒、黄德顺</td></tr>
+        <tr class=""><td>2026-08-05</td><td>滩涂紫菜采收</td><td>5 人</td><td class="sign">冯德顺、徐庆丰、曹洪涛、黄绍安、赵金生</td></tr>
+        <tr class=""><td>2026-08-01</td><td>近海围网作业</td><td>4 人</td><td class="sign">于金生、唐阿根、谢阿水、朱宝林</td></tr>
+        <tr class=""><td>2026-07-28</td><td>滩涂晒苗管护</td><td>5 人</td><td class="sign">刘庆丰、朱满仓、陈国强、徐国强、程书恒</td></tr>
+        <tr class=""><td>2026-07-24</td><td>出海收笼取渔获</td><td>4 人</td><td class="sign">刘满仓、郑长根、董志远、宋洪涛</td></tr>
+        <tr class=""><td>2026-07-20</td><td>滩涂紫菜采收</td><td>5 人</td><td class="sign">王国强、刘书恒、林阿根、高满仓、郭志远</td></tr>
+        <tr class=""><td>2026-07-16</td><td>滩涂晒苗管护</td><td>4 人</td><td class="sign">周阿根、冯德顺、朱炳文、程阿水</td></tr>
+        <tr class=""><td>2026-07-12</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">何广田、罗金生、朱绍安</td></tr>
+        <tr class=""><td>2026-07-08</td><td>滩涂晒苗管护</td><td>4 人</td><td class="sign">朱阿根、徐满仓、冯庆丰、王德海</td></tr>
+        <tr class=""><td>2026-07-04</td><td>滩涂捡螺挖蛤</td><td>4 人</td><td class="sign">孙守义、杨满仓、吴德海、郑书恒</td></tr>
+        <tr class=""><td>2026-06-30</td><td>滩涂紫菜采收</td><td>2 人</td><td class="sign">陈广田、马书恒</td></tr>
+        <tr class=""><td>2026-06-26</td><td>滩涂晒苗管护</td><td>2 人</td><td class="sign">周志远、王国强</td></tr>
+        <tr class=""><td>2026-06-22</td><td>滩涂捡螺挖蛤</td><td>4 人</td><td class="sign">王德海、董德海、赵绍安、周书恒</td></tr>
+        <tr class=""><td>2026-06-18</td><td>滩涂捡螺挖蛤</td><td>6 人</td><td class="sign">李阿根、周长根、曹德顺、李庆丰、赵满仓、高国强</td></tr>
+        <tr class=""><td>2026-06-14</td><td>近海拖网捕捞</td><td>4 人</td><td class="sign">朱宝林、陈洪涛、杨阿水、徐长根</td></tr>
+        <tr class=""><td>2026-06-10</td><td>滩涂晒苗管护</td><td>5 人</td><td class="sign">李书恒、董满仓、程宝林、胡绍安、王广田</td></tr>
+        <tr class=""><td>2026-06-06</td><td>近海拖网捕捞</td><td>2 人</td><td class="sign">杨阿根、李阿根</td></tr>
+        <tr class=""><td>2026-06-02</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">宋庆丰、王炳文、胡长根</td></tr>
+        <tr class=""><td>2026-05-29</td><td>近海拖网捕捞</td><td>4 人</td><td class="sign">陈国强、董广田、刘志远、李阿贵</td></tr>
+        <tr class=""><td>2026-05-25</td><td>滩涂晒苗管护</td><td>3 人</td><td class="sign">高满仓、郭洪涛、董阿水</td></tr>
+        <tr class=""><td>2026-05-21</td><td>港湾护渔巡查</td><td>3 人</td><td class="sign">罗庆丰、马阿根、黄德顺</td></tr>
+        <tr class=""><td>2026-05-17</td><td>出海收笼取渔获</td><td>6 人</td><td class="sign">何阿根、孙春生、唐金生、张德顺、郭金生、罗绍安</td></tr>
+        <tr class=""><td>2026-05-13</td><td>出海收笼取渔获</td><td>4 人</td><td class="sign">马志远、孙德顺、黄广田、赵庆丰</td></tr>
+        <tr class=""><td>2026-05-09</td><td>近海围网作业</td><td>3 人</td><td class="sign">冯守义、杨德顺、周永年</td></tr>
+        <tr class=""><td>2026-05-05</td><td>滩涂晒苗管护</td><td>2 人</td><td class="sign">陈炳文、赵庆丰</td></tr>
+        <tr class=""><td>2026-05-01</td><td>出海收笼取渔获</td><td>6 人</td><td class="sign">赵金生、徐金生、林长根、徐阿根、程德顺、林志远</td></tr>
+        <tr class=""><td>2026-04-27</td><td>滩涂紫菜采收</td><td>6 人</td><td class="sign">孙炳文、朱德顺、杨金生、郑阿根、胡洪涛、徐洪涛</td></tr>
+        <tr class=""><td>2026-04-23</td><td>滩涂紫菜采收</td><td>4 人</td><td class="sign">宋洪涛、黄德顺、徐书恒、罗金生</td></tr>
+        <tr class=""><td>2026-04-19</td><td>滩涂紫菜采收</td><td>3 人</td><td class="sign">何春生、吴春生、胡志远</td></tr>
+        <tr class=""><td>2026-04-15</td><td>滩涂晒苗管护</td><td>5 人</td><td class="sign">张广田、李宝林、马春生、李金生、赵志远</td></tr>
+        <tr class=""><td>2026-04-11</td><td>港湾护渔巡查</td><td>5 人</td><td class="sign">胡庆丰、郭志远、杨守义、张德顺、王德顺</td></tr>
+        <tr class=""><td>2026-04-07</td><td>近海拖网捕捞</td><td>4 人</td><td class="sign">何守义、刘绍安、周洪涛、周长根</td></tr>
+        <tr class=""><td>2026-04-03</td><td>滩涂捡螺挖蛤</td><td>5 人</td><td class="sign">郑春生、刘满仓、郑国强、唐炳文、刘志远</td></tr>
+        <tr class=""><td>2026-03-30</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">林庆丰、高永年、吴庆丰</td></tr>
+        <tr class=""><td>2026-03-26</td><td>滩涂紫菜采收</td><td>6 人</td><td class="sign">林德海、唐国强、胡满仓、吴书恒、陈永年、郭洪涛</td></tr>
+        <tr class=""><td>2026-03-22</td><td>港湾护渔巡查</td><td>3 人</td><td class="sign">谢阿贵、曹永年、张春生</td></tr>
+        <tr class=""><td>2026-03-18</td><td>港湾护渔巡查</td><td>3 人</td><td class="sign">陈宝林、陈广田、曹宝林</td></tr>
+        <tr class=""><td>2026-03-14</td><td>近海拖网捕捞</td><td>3 人</td><td class="sign">宋书恒、陈长根、孙德顺</td></tr>
+        <tr class=""><td>2026-03-10</td><td>港湾护渔巡查</td><td>6 人</td><td class="sign">程阿根、郭宝林、曹德海、何春生、何守义、马德顺</td></tr>
+        <tr class=""><td>2026-03-06</td><td>滩涂晒苗管护</td><td>3 人</td><td class="sign">冯阿贵、唐春生、徐长根</td></tr>
+        <tr class=""><td>2026-03-02</td><td>滩涂晒苗管护</td><td>5 人</td><td class="sign">孙庆丰、杨绍安、朱金生、郭炳文、孙春生</td></tr>
+        <tr class=""><td>2026-02-26</td><td>滩涂捡螺挖蛤</td><td>5 人</td><td class="sign">胡阿根、杨阿根、王守义、张志远、马满仓</td></tr>
+        <tr class=""><td>2026-02-22</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">谢庆丰、程阿根、郑广田</td></tr>
+        <tr class=""><td>2026-02-18</td><td>滩涂紫菜采收</td><td>3 人</td><td class="sign">孙阿根、何春生、马庆丰</td></tr>
+        <tr class=""><td>2026-02-14</td><td>滩涂捡螺挖蛤</td><td>6 人</td><td class="sign">赵德顺、曹德顺、陈德顺、罗洪涛、胡阿贵、曹守义</td></tr>
+        <tr class=""><td>2026-02-10</td><td>出海收笼取渔获</td><td>5 人</td><td class="sign">徐阿水、马炳文、冯绍安、林永年、陈春生</td></tr>
+        <tr class=""><td>2026-02-06</td><td>近海放流刺网</td><td>4 人</td><td class="sign">孙书恒、于长根、梁绍安、罗阿根</td></tr>
+        <tr class=""><td>2026-02-02</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">唐长根、罗炳文、高广田</td></tr>
+        <tr class=""><td>2026-01-29</td><td>滩涂捡螺挖蛤</td><td>5 人</td><td class="sign">董阿根、胡书恒、何德海、郭春生、吴庆丰</td></tr>
+        <tr class=""><td>2026-01-25</td><td>港湾护渔巡查</td><td>4 人</td><td class="sign">高书恒、马阿贵、杨德海、吴志远</td></tr>
+        <tr class=""><td>2026-01-21</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">宋满仓、程宝林、周长根</td></tr>
+        <tr class=""><td>2026-01-17</td><td>港湾护渔巡查</td><td>3 人</td><td class="sign">高春生、陈德顺、马广田</td></tr>
+        <tr class=""><td>2026-01-13</td><td>近海拖网捕捞</td><td>3 人</td><td class="sign">吴志远、陈阿贵、刘书恒</td></tr>
+        <tr class=""><td>2026-01-09</td><td>港湾护渔巡查</td><td>4 人</td><td class="sign">马守义、谢金生、林守义、林阿根</td></tr>
+        <tr class=""><td>2026-01-05</td><td>滩涂紫菜采收</td><td>3 人</td><td class="sign">高德海、董金生、周德顺</td></tr>
+        <tr class=""><td>2026-01-01</td><td>滩涂晒苗管护</td><td>4 人</td><td class="sign">董书恒、陈金生、黄绍安、高阿根</td></tr>
+        <tr class=""><td>2025-12-28</td><td>滩涂晒苗管护</td><td>3 人</td><td class="sign">吴德海、宋庆丰、唐广田</td></tr>
+        <tr class=""><td>2025-12-24</td><td>出海收笼取渔获</td><td>5 人</td><td class="sign">黄德海、于书恒、李宝林、李阿水、谢德海</td></tr>
+        <tr class=""><td>2025-12-20</td><td>滩涂晒苗管护</td><td>5 人</td><td class="sign">宋长根、曹书恒、罗阿根、马金生、宋长根</td></tr>
+        <tr class=""><td>2025-12-16</td><td>近海拖网捕捞</td><td>3 人</td><td class="sign">刘广田、董书恒、胡绍安</td></tr>
+        <tr class=""><td>2025-12-12</td><td>滩涂捡螺挖蛤</td><td>2 人</td><td class="sign">赵春生、董德海</td></tr>
+        <tr class=""><td>2025-12-08</td><td>近海围网作业</td><td>4 人</td><td class="sign">林阿贵、宋德顺、胡志远、何阿根</td></tr>
+        <tr class=""><td>2025-12-04</td><td>滩涂捡螺挖蛤</td><td>3 人</td><td class="sign">胡长根、黄国强、张春生</td></tr>
+        <tr class=""><td>2025-11-30</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">张志远、何长根、陈绍安</td></tr>
+        <tr class=""><td>2025-11-26</td><td>出海收笼取渔获</td><td>4 人</td><td class="sign">唐阿根、冯德海、宋德海、杨阿贵</td></tr>
+        <tr class=""><td>2025-11-22</td><td>滩涂紫菜采收</td><td>2 人</td><td class="sign">李书恒、吴宝林</td></tr>
+        <tr class=""><td>2025-11-18</td><td>近海围网作业</td><td>4 人</td><td class="sign">罗绍安、黄金生、董志远、徐阿水</td></tr>
+        <tr class=""><td>2025-11-14</td><td>近海围网作业</td><td>4 人</td><td class="sign">周春生、林书恒、吴阿水、罗广田</td></tr>
+        <tr class=""><td>2025-11-10</td><td>出海收笼取渔获</td><td>3 人</td><td class="sign">罗德海、何阿根、朱绍安</td></tr>
+        <tr class=""><td>2025-11-06</td><td>近海放流刺网</td><td>3 人</td><td class="sign">张书恒、陈阿贵、董春生</td></tr>
+        <tr class=""><td>2025-11-02</td><td>近海拖网捕捞</td><td>5 人</td><td class="sign">于书恒、高洪涛、黄洪涛、林德顺、冯书恒</td></tr>
+        <tr class=""><td>2025-10-29</td><td>近海放流刺网</td><td>5 人</td><td class="sign">胡德海、林阿水、董永年、张阿水、黄阿根</td></tr>
+        <tr class=""><td>2025-10-25</td><td>滩涂晒苗管护</td><td>3 人</td><td class="sign">王满仓、曹国强、高德顺</td></tr>
+        <tr class=""><td>2025-10-21</td><td>港湾护渔巡查</td><td>4 人</td><td class="sign">冯春生、董阿根、黄绍安、吴德海</td></tr>
+        <tr class=""><td>2025-10-17</td><td>滩涂捡螺挖蛤</td><td>5 人</td><td class="sign">冯德海、陈阿贵、徐守义、赵阿水、董永年</td></tr>
+        <tr class=""><td>2025-10-13</td><td>近海拖网捕捞</td><td>3 人</td><td class="sign">林德海、曹德顺、徐志远</td></tr>
+        <tr class=""><td>2025-10-09</td><td>港湾护渔巡查</td><td>3 人</td><td class="sign">冯阿贵、郭守义、李长根</td></tr>
+        <tr><td>2025-10-08</td><td>近海拖网捕捞</td><td>2 人</td><td class="sign">陈寿</td></tr>
+        <tr class=""><td>2025-10-05</td><td>近海围网作业</td><td>4 人</td><td class="sign">李德顺、谢宝林、王阿根、林绍安</td></tr>
+        <tr class=""><td>2025-10-01</td><td>滩涂紫菜采收</td><td>6 人</td><td class="sign">林绍安、郑阿根、赵长根、周阿水、郑春生、孙德海</td></tr>
+        </tbody>
+        </table>
+        <button type="button" class="register-back" id="registerBack">← 返回在线查询</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 便民事项（沿用主页内容） ===== -->
+  <section class="block">
+    <div class="panel">
+      <h3>村内常用事项 <span class="meta">办理指引</span></h3>
+      <div class="service-grid">
+        <div class="service-card">
+          <h4>合作医疗登记</h4>
+          <p>新农合缴费、参保信息核对与报销材料代收，逢办公时间到村委会办理。</p>
+          <div class="service-meta">办理地点：村委会平房</div>
+        </div>
+        <div class="service-card">
+          <h4>户籍与证明开具</h4>
+          <p>居住证明、亲属关系等村级证明材料，由村委核实后出具。</p>
+          <div class="service-meta">需携带：户口簿</div>
+        </div>
+        <div class="service-card">
+          <h4>渔船与滩涂登记</h4>
+          <p>近海作业船只、滩涂种养户的信息登记与年度核对，由渔业组受理。</p>
+          <div class="service-meta">对接：村渔业小组</div>
+        </div>
+        <div class="service-card">
+          <h4>水电与道路报修</h4>
+          <p>村道坑洼、供水管线及公共照明故障，可到值班室登记，统一安排修缮。</p>
+          <div class="service-meta">受理：村值班室</div>
+        </div>
+        <div class="service-card">
+          <h4>老人与帮扶代办</h4>
+          <p>行动不便的老人可委托村委代办缴费、取件等日常事项。</p>
+          <div class="service-meta">对接：村便民联络员</div>
+        </div>
+        <div class="service-card">
+          <h4>农事与气象提醒</h4>
+          <p>潮汛、大风与降温天气提醒，以及种养时节的通知，在公告栏同步发布。</p>
+          <div class="service-meta">查看：村公告栏</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <a class="back-link" href="index.html">← 返回村网首页</a>
+
+</main>
+
+<footer class="site">
+  <div class="wrap footer-inner">
+    <div>© 2026 石浦岙村村网 · 本站为村内门户示意页面</div>
+    <div class="links">
+      <a href="index.html">首页</a>
+      <a href="走进石浦岙村.html">走进石浦岙村</a>
+      <a href="村公告栏.html">公告</a>
+      <a href="联系我们.html">联系我们</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ===== 独立在线查询：仅作用于本页办事事项，不调用主页站内搜索 ===== */
+  (function(){
+    var form=document.getElementById('queryForm');
+    var input=document.getElementById('queryInput');
+    var box=document.getElementById('queryResult');
+    var registerWrap=document.getElementById('registerWrap');
+    var registerBack=document.getElementById('registerBack');
+    var backupWrap=document.getElementById('backupWrap');
+    var backupForm=document.getElementById('backupForm');
+    var backupInput=document.getElementById('backupInput');
+    var backupResult=document.getElementById('backupResult');
+    var reportWrap=document.getElementById('reportWrap');
+    var reportBack=document.getElementById('reportBack');
+
+    /* 值班室号码（管理员账号口径） */
+    var DUTY_PHONE='0916-6248317';
+
+    /* 办事事项本地索引（前端演示数据） */
+    var ITEMS=[
+      {keys:['合作医疗','新农合','医保','参保','报销'],title:'合作医疗登记',meta:'办理地点：村委会平房',detail:'新农合缴费、参保信息核对与报销材料代收，逢办公时间到村委会办理。',paused:true},
+      {keys:['户籍','证明','居住证明','亲属关系','户口簿'],title:'户籍与证明开具',meta:'需携带：户口簿',detail:'居住证明、亲属关系等村级证明材料，由村委核实后出具。',paused:true},
+      {keys:['渔船','滩涂','船只','种养','渔业'],title:'渔船与滩涂登记',meta:'对接：村渔业小组',detail:'近海作业船只、滩涂种养户的信息登记与年度核对，由渔业组受理。'},
+      {keys:['水电','道路','报修','照明','水管','村道'],title:'水电与道路报修',meta:'受理：村值班室',detail:'村道坑洼、供水管线及公共照明故障，可到值班室登记，统一安排修缮。',paused:true},
+      {keys:['老人','帮扶','代办','缴费','取件'],title:'老人与帮扶代办',meta:'对接：村便民联络员',detail:'行动不便的老人可委托村委代办缴费、取件等日常事项。',paused:true},
+      {keys:['农事','气象','潮汛','大风','降温','提醒'],title:'农事与气象提醒',meta:'查看：村公告栏',detail:'潮汛、大风与降温天气提醒，以及种养时节的通知，在公告栏同步发布。',paused:true}
+    ];
+
+    /* 管理员入口：输入管理员账号后进入后台（前端演示占位） */
+    var ADMIN_ACCOUNT='管理员后台';
+
+    function renderItems(list){
+      if(!list.length){
+        box.innerHTML='<div class="query-error">未查询到相关事项，可到村委会值班室咨询，或拨打村值班室电话 0916-6248317。</div>';
+        return;
+      }
+      box.innerHTML=list.map(function(it){
+        return '<div class="q-item"><h5>'+it.title+'</h5><p>'+it.detail+'</p><div class="q-meta">'+it.meta+'</div></div>';
+      }).join('');
+    }
+
+    function showRegister(){
+      box.innerHTML='';
+      registerWrap.hidden=false;
+      registerWrap.scrollIntoView({behavior:'smooth',block:'start'});
+    }
+    function hideRegister(){
+      registerWrap.hidden=true;
+    }
+
+    function showBackup(){
+      hideRegister();
+      hideReport();
+      box.innerHTML='';
+      backupResult.innerHTML='';
+      backupInput.value='';
+      backupWrap.hidden=false;
+      backupWrap.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    function hideBackup(){
+      backupWrap.hidden=true;
+      backupResult.innerHTML='';
+      backupInput.value='';
+      hideReport();
+    }
+
+    function showReport(){
+      backupResult.innerHTML='';
+      reportWrap.hidden=false;
+      reportWrap.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    function hideReport(){
+      reportWrap.hidden=true;
+    }
+
+    function renderAdmin(){
+      box.innerHTML='<div class="q-item q-admin"><h5>管理员后台入口</h5><p>身份核验通过，已进入管理员后台页面（前端演示，未接入真实权限）。</p><div class="q-meta">提示：该入口仅对管理员开放</div></div>';
+    }
+
+    function normalize(s){return s.replace(/\s+/g,'').replace(/[—–-]/g,'-');}
+
+    function search(){
+      var q=input.value.trim();
+      if(!q){hideBackup();box.innerHTML='<div class="q-hint">请输入事项名称、户籍或姓名后查询。</div>';return;}
+      var kw=q.toLowerCase();
+      /* 输入值班室号码：展开备份档案独立搜索框 */
+      if(normalize(q).indexOf(normalize(DUTY_PHONE))>-1){showBackup();return;}
+      hideBackup();
+      if(kw.indexOf('内部病例调查简报')>-1||(kw.indexOf('病例')>-1&&kw.indexOf('简报')>-1)||(kw.indexOf('.pdf')>-1&&kw.indexOf('病例')>-1)){
+        hideRegister();
+        box.innerHTML='<div class="query-error" style="color:#8a2f24;border-left-color:#8a2f24">该档案已被删除，详情请咨询客服服务。</div>';
+        return;
+      }
+      if(kw.indexOf(ADMIN_ACCOUNT.toLowerCase())>-1||kw.indexOf('管理员账号')>-1){hideRegister();renderAdmin();return;}
+      var hit=ITEMS.filter(function(it){
+        return it.keys.some(function(k){return kw.indexOf(k.toLowerCase())>-1;})||it.title.toLowerCase().indexOf(kw)>-1;
+      });
+      /* 渔船与滩涂登记：进入详细登记表 */
+      var reg=hit.filter(function(it){return it.title==='渔船与滩涂登记';});
+      if(reg.length){showRegister();return;}
+      hideRegister();
+      var paused=hit.filter(function(it){return it.paused;});
+      if(paused.length){
+        var names=paused.map(function(it){return it.title;}).join('、');
+        box.innerHTML='<div class="query-error" style="color:#8a2f24;border-left-color:#8a2f24">'+names+'：已暂停服务。</div>';
+        return;
+      }
+      renderItems(hit);
+    }
+
+    /* 备份档案二次查询（独立于上方办事事项查询） */
+    backupForm.addEventListener('submit',function(e){
+      e.preventDefault();
+      var bq=backupInput.value.trim();
+      if(!bq){hideReport();backupResult.innerHTML='<span style="color:var(--ink-soft)">请输入档案名称或编号后查询。</span>';return;}
+      var bk=bq.toLowerCase();
+      /* 命中内部病例调查简报：展示医院诊断说明（PDF 文书） */
+      if(bk.indexOf('内部病例调查简报')>-1||(bk.indexOf('病例')>-1&&bk.indexOf('简报')>-1)||(bk.indexOf('.pdf')>-1&&bk.indexOf('病例')>-1)){
+        showReport();
+        return;
+      }
+      hideReport();
+      backupResult.innerHTML='<span style="color:var(--ink-soft)">暂未检索到与“'+bq+'”相关的备份档案。</span>';
+    });
+
+    reportBack.addEventListener('click',function(){
+      hideReport();
+      backupResult.innerHTML='';
+      backupInput.focus();
+    });
+
+    registerBack.addEventListener('click',function(){
+      hideRegister();
+      hideBackup();
+      input.value='';
+      box.innerHTML='<div class="q-hint">请输入事项名称、户籍或姓名后查询。</div>';
+    });
+
+    form.addEventListener('submit',function(e){e.preventDefault();search();});
+    input.addEventListener('input',function(){if(!input.value.trim()){box.innerHTML='';hideBackup();}});
+  })();
+</script>
+
+</body>
+</html>

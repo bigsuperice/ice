@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>本地新闻 · 石浦岙村村网</title>
+<style>
+  :root{
+    --paper:#f1e9d6;
+    --paper-2:#e7dcc2;
+    --ink:#3a2f22;
+    --ink-soft:#5c4d38;
+    --line:#b9a67e;
+    --accent:#6d5a34;
+    --accent-soft:#8a7344;
+    --card:rgba(244,236,217,.92);
+    --shadow:0 2px 10px rgba(58,47,34,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+    color:var(--ink);background-color:#d8c9a3;line-height:1.7;
+  }
+  a{color:inherit;text-decoration:none}
+  ul{list-style:none}
+  img{display:block;max-width:100%}
+
+  .bg-layer{
+    position:fixed;inset:0;z-index:-2;
+    background:url("assets/bg-village.jpg") center/cover no-repeat fixed;
+    filter:sepia(.28) saturate(.85) brightness(.92);
+  }
+  .bg-layer::after{
+    content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(58,47,34,.35) 0%,rgba(58,47,34,.18) 38%,rgba(216,201,163,.55) 100%);
+  }
+  .grain{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.18;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+  header.site{background:rgba(58,47,34,.82);color:var(--paper);border-bottom:3px solid var(--accent-soft)}
+  .site-top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0 12px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:14px}
+  .brand svg{width:44px;height:44px;flex:none}
+  .brand h1{font-size:26px;letter-spacing:.18em;font-weight:700}
+  .brand .sub{font-size:13px;letter-spacing:.3em;color:#d9c9a2;margin-top:2px}
+
+  nav.main{border-top:1px solid rgba(217,201,162,.25)}
+  nav.main ul{display:flex;flex-wrap:wrap;gap:4px}
+  nav.main a{display:block;padding:12px 20px;font-size:15px;letter-spacing:.12em;color:#e7dcc2;border-bottom:2px solid transparent}
+  nav.main a:hover,nav.main a.active{color:#fff;border-bottom-color:var(--accent-soft);background:rgba(255,255,255,.06)}
+
+  .page-head{padding:44px 0 10px;color:#f6eed8}
+  .page-head .crumb{font-size:13px;letter-spacing:.15em;color:#e4d5ac;margin-bottom:10px}
+  .page-head .crumb a:hover{text-decoration:underline}
+  .page-head h2{font-size:30px;letter-spacing:.22em;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+  .page-head p{margin-top:10px;font-size:15px;letter-spacing:.12em;color:#e4d5ac;text-shadow:0 1px 4px rgba(0,0,0,.35)}
+
+  section.block{margin:30px 0}
+  .panel{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);padding:24px 26px}
+  .panel h3{font-size:20px;letter-spacing:.18em;color:var(--ink);border-left:4px solid var(--accent-soft);padding-left:12px;margin-bottom:18px}
+  .panel h3 .meta{font-size:12px;color:var(--ink-soft);letter-spacing:.1em;margin-left:10px}
+
+  /* 新闻列表 */
+  .news-list li{border-bottom:1px dashed var(--line)}
+  .news-list li:last-child{border-bottom:none}
+  .news-item{width:100%;background:none;border:none;font-family:inherit;text-align:left;cursor:pointer;
+    padding:16px 0;color:var(--ink)}
+  .news-item h4{font-size:17px;margin-bottom:5px}
+  .news-item:hover h4{color:var(--accent)}
+  .news-item .pin-tag{display:inline-block;margin-left:8px;font-size:11px;border:1px solid var(--accent);background:var(--accent);color:var(--paper);padding:1px 7px;border-radius:2px;letter-spacing:.05em;vertical-align:middle}
+  li.pinned .news-item{background:rgba(109,90,52,.08);border-left:3px solid var(--accent-soft);padding-left:12px}
+  .news-item .news-meta{font-size:12px;color:var(--ink-soft);margin-bottom:7px;letter-spacing:.05em}
+  .news-item p{font-size:14px;color:var(--ink-soft)}
+
+  /* 新闻详情 */
+  .article-head{border-bottom:1px dashed var(--line);padding-bottom:16px;margin-bottom:18px}
+  .article-head h3{font-size:23px;letter-spacing:.08em;border:none;padding-left:0;margin-bottom:10px}
+  .article-head .news-meta{font-size:13px;color:var(--accent-soft);letter-spacing:.05em}
+  .article-body p{font-size:15px;color:var(--ink);margin:12px 0}
+  .article-body p:first-child{margin-top:0}
+  .article-figure{margin:18px 0 4px}
+  .article-figure img{width:100%;max-height:520px;object-fit:contain;border:1px solid var(--line);filter:sepia(.22) saturate(.85);background:#2a2118}
+  .article-figure figcaption{font-size:12px;color:var(--ink-soft);margin-top:8px;letter-spacing:.05em}
+
+  /* 失踪人员表 */
+  .missing-wrap{margin-top:18px}
+  .missing-table{width:100%;border-collapse:collapse;font-size:14px}
+  .missing-table th,.missing-table td{border:1px solid var(--line);padding:10px 12px;vertical-align:middle}
+  .missing-table th{background:var(--paper-2);letter-spacing:.1em;color:var(--ink-soft)}
+  .missing-table td.avatar{width:18%}
+  .missing-table .avatar img{width:72px;height:88px;object-fit:cover;border:1px solid var(--line);filter:sepia(.25) saturate(.85)}
+  .missing-table td.name{font-weight:700}
+  .missing-note{margin-top:10px;font-size:13px;color:var(--accent);letter-spacing:.03em;border-left:3px solid var(--accent-soft);padding-left:12px}
+
+  /* 附件 */
+  .attach-wrap{margin-top:18px}
+  .attach-box{display:flex;gap:12px;align-items:center;border:1px dashed var(--line);padding:14px 16px;background:rgba(244,236,217,.6)}
+  .attach-box.deleted{border-color:var(--ink-soft);background:rgba(58,47,34,.06)}
+  .attach-icon{flex:none;width:30px;height:30px;color:var(--ink-soft)}
+  .attach-icon svg{width:100%;height:100%}
+  .attach-name{font-size:14px;color:var(--ink-soft);text-decoration:line-through}
+  .attach-error{font-size:13px;color:var(--accent);margin-top:4px}
+
+  .back-link{display:inline-block;margin:10px 0 30px;font-size:14px;letter-spacing:.12em;color:var(--accent);border-bottom:1px solid var(--accent-soft)}
+
+  /* 评论区 */
+  .comments{margin-top:26px;border-top:2px solid var(--line);padding-top:20px}
+  .comments h4{font-size:16px;letter-spacing:.12em;margin-bottom:14px}
+  .comment-list{margin-bottom:18px}
+  .comment{padding:12px 0;border-bottom:1px dashed var(--line)}
+  .comment:last-child{border-bottom:none}
+  .comment .who{display:flex;justify-content:space-between;gap:12px;font-size:13px;margin-bottom:5px}
+  .comment .who b{color:var(--accent-soft)}
+  .comment .who .time{font-size:12px;color:var(--ink-soft)}
+  .comment .msg{font-size:14px;color:var(--ink)}
+  .comment-form{display:grid;grid-template-columns:180px 1fr;gap:12px;margin-top:6px}
+  .comment-form input,.comment-form textarea{
+    width:100%;border:1px solid var(--line);background:var(--paper);color:var(--ink);
+    font-family:inherit;font-size:14px;padding:9px 12px;outline:none;resize:vertical;
+  }
+  .comment-form textarea{min-height:70px}
+  .comment-form .field-name{grid-column:1}
+  .comment-form .field-msg{grid-column:2;grid-row:1}
+  .comment-form .field-act{grid-column:2;grid-row:2;justify-self:start}
+  .comment-form button{
+    border:1px solid var(--accent-soft);background:var(--accent-soft);color:var(--paper);
+    font-family:inherit;font-size:14px;letter-spacing:.1em;padding:9px 22px;cursor:pointer;
+  }
+  .comment-form button:hover{background:var(--accent)}
+  .comment-hint{grid-column:2;font-size:12px;color:var(--ink-soft)}
+
+  footer.site{margin-top:40px;background:rgba(58,47,34,.88);color:#d9c9a2;border-top:3px solid var(--accent-soft);padding:22px 0}
+  .footer-inner{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13px;letter-spacing:.08em}
+  .footer-inner .links{display:flex;gap:18px;flex-wrap:wrap}
+  .footer-inner a:hover{color:#fff}
+
+  .hidden{display:none}
+
+  @media (max-width:860px){
+    .site-top{flex-direction:column;align-items:flex-start}
+    .page-head h2{font-size:24px}
+    .comment-form{grid-template-columns:1fr}
+    .comment-form .field-name,.comment-form .field-msg,.comment-form .field-act{grid-column:1;grid-row:auto}
+  }
+  @media (max-width:520px){
+    nav.main ul{gap:0}
+    nav.main a{padding:10px 12px;font-size:14px}
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-layer" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="site">
+  <div class="wrap">
+    <div class="site-top">
+      <div class="brand">
+        <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
+          <rect width="48" height="48" rx="6" fill="#6d5a34"/>
+          <path d="M10 30h28l-4 7H14z" fill="#e7dcc2"/>
+          <path d="M24 12v13" stroke="#e7dcc2" stroke-width="2"/>
+          <path d="M24 14l9 8H24z" fill="#e7dcc2"/>
+          <path d="M8 39h32" stroke="#c9b887" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <div>
+          <h1>石浦岙村</h1>
+          <div class="sub">沿海渔村 · 村务门户</div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="main" aria-label="主导航">
+      <ul>
+        <li><a href="index.html">首页</a></li>
+        <li><a href="走进石浦岙村.html">走进石浦岙村</a></li>
+        <li><a href="村公告栏.html">公告</a></li>
+        <li><a href="本地新闻.html" class="active">本地新闻</a></li>
+        <li><a href="村史图库.html">图库</a></li>
+        <li><a href="便民服务.html">便民服务</a></li>
+        <li><a href="留言板.html">留言板</a></li>
+        <li><a href="联系我们.html">联系我们</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- ===== 列表视图 ===== -->
+  <div class="page-head" id="listView">
+    <div class="crumb"><a href="index.html">首页</a> / 本地新闻</div>
+    <h2>本地新闻</h2>
+    <p>乡间近况、生产农事与港湾动态，点击条目查看详情与村民留言</p>
+  </div>
+
+  <section class="block" id="listSection">
+    <div class="panel">
+      <h3>新闻动态 <span class="meta" id="newsCount">共 4 条</span></h3>
+      <ul class="news-list" id="newsList"></ul>
+    </div>
+  </section>
+
+  <!-- ===== 详情视图 ===== -->
+  <div class="page-head hidden" id="detailView">
+    <div class="crumb"><a href="index.html">首页</a> / <a href="本地新闻.html">本地新闻</a> / <span id="crumbTitle">新闻详情</span></div>
+    <h2>新闻详情</h2>
+  </div>
+
+  <section class="block hidden" id="detailSection">
+    <div class="panel">
+      <div class="article-head">
+        <h3 id="articleTitle"></h3>
+        <div class="news-meta" id="articleMeta"></div>
+      </div>
+      <div class="article-body" id="articleBody"></div>
+      <figure class="article-figure" id="articleFigure" hidden>
+        <img id="articleImg" src="" alt="">
+        <figcaption id="articleCaption"></figcaption>
+      </figure>
+
+      <div class="missing-wrap" id="missingWrap" hidden>        <table class="missing-table">
+          <colgroup><col style="width:18%"><col style="width:20%"><col style="width:14%"><col style="width:48%"></colgroup>
+          <thead>
+            <tr><th>头像</th><th>姓名</th><th>性别 / 年龄</th><th>失踪时间与经过</th></tr>
+          </thead>
+          <tbody id="missingBody"></tbody>
+        </table>
+        <p class="missing-note" id="missingNote"></p>
+      </div>
+
+      <div class="attach-wrap" id="attachWrap" hidden>
+        <div class="attach-box deleted">
+          <span class="attach-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+          </span>
+          <div class="attach-info">
+            <div class="attach-name" id="attachName"></div>
+            <div class="attach-error" id="attachError"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="comments">
+        <h4>村民留言 <span class="meta" id="commentCount"></span></h4>
+        <ul class="comment-list" id="commentList"></ul>
+        <form class="comment-form" id="commentForm">
+          <div class="field-name">
+            <input type="text" id="commentName" placeholder="称呼（可留空）" aria-label="留言称呼">
+          </div>
+          <div class="field-msg">
+            <textarea id="commentText" placeholder="写下你的看法…" aria-label="留言内容"></textarea>
+          </div>
+          <div class="field-act">
+            <button type="submit">发表留言</button>
+            <span class="comment-hint" id="commentHint"></span>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <a class="back-link" href="javascript:void(0)" id="backToList">← 返回新闻列表</a>
+  </section>
+
+</main>
+
+<footer class="site">
+  <div class="wrap footer-inner">
+    <div>© 2026 石浦岙村村网 · 本站为村内门户示意页面</div>
+    <div class="links">
+      <a href="index.html">首页</a>
+      <a href="走进石浦岙村.html">走进石浦岙村</a>
+      <a href="村公告栏.html">公告</a>
+      <a href="联系我们.html">联系我们</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  /* ===== 本地新闻数据（含详情与评论） ===== */
+  var NEWS=[
+    {
+      id:7,
+      pinned:true,
+      title:"寻人启事：我村近期失踪人口登记汇总表（更新至2026年）",
+      meta:"2026-11-18 · 村委会",
+      body:[
+        "为配合公安部门排查，现将我村近年来接到报案的失踪人员信息汇总如下，望知情者提供线索。"
+      ],
+      missing:[
+        {avatar:"assets/missing-zhao.jpg",name:"赵满囤",sex:"男",age:"年龄不详",detail:"2026 年 11 月于村桥洞下失踪。"},
+        {avatar:"assets/missing-wang.jpg",name:"王春花",sex:"女",age:"54 岁",detail:"2026 年 10 月 16 日上山寻找父亲后失踪。"},
+        {avatar:"assets/missing-li.jpg",name:"李长福",sex:"男",age:"67 岁",detail:"2026 年 10 月 15 日上山挖笋后未归。"}
+      ],
+      missingNote:"注：若发现上述人员遗体或遗物，请立即拨打 110。请勿在村内私自寻找。",
+      comments:[
+        {who:"村里老人",time:"2026-11-18",msg:"这个月桥洞那边又少了个人，平时人少，谁也没留意到。"},
+        {who:"上山砍柴的村民",time:"2026-11-18",msg:"春花她爹先上的山，春花跟着去找，父女俩都没下来，山里路滑得很。"},
+        {who:"值班村干部",time:"2026-11-18",msg:"名单都在这了，有线索直接报派出所，别自己上山下滩去找，安全第一。"},
+        {who:"在外打工的村里人",time:"2026-11-18",msg:"长福叔挖个笋就没回来，山上那片老林子真不能再随便进了。"}
+      ]
+    },
+    {
+      id:1,
+      title:"滩涂围塘修整完工，近海养殖恢复如常",
+      meta:"2026-11-15 · 村委会",
+      body:[
+        "村口外侧的旧围塘经过半个多月清淤加固，塘埂与进水渠已修整完毕，养殖户陆续下苗，海面恢复往日平静。",
+        "这次修整由村里统一安排劳力，重点加固了被风浪淘松的塘埂，疏通了淤积多年的进水渠。负责人介绍，等苗种落稳，还会在塘口边立一块水位提示牌，方便各户照看。",
+        "几位常赶海的老人说，往年一到潮起时节塘埂就容易渗水，这回补结实了，养殖户心里踏实不少。"
+      ],
+      comments:[
+        {who:"养殖户老周",time:"2026-11-15",msg:"渠通了就好，这几天正准备下苗，赶上好时候。"},
+        {who:"阿妹",time:"2026-11-16",msg:"塘埂补得挺扎实，希望明年收成能稳当些。"},
+        {who:"路过的赶海人",time:"2026-11-16",msg:"今早路过看了一眼，进水渠确实不淤了。"},
+        {who:"陈阿婆",time:"2026-11-17",msg:"下雨天再来看看吧，现在说稳还早。"},
+        {who:"守义",time:"2026-11-17",msg:"统一修一遍比各家自己折腾强。"}
+      ]
+    },
+    {
+      id:2,
+      title:"老槐树下的晒场迎来秋收最后一茬",
+      meta:"2026-11-09 · 村通讯",
+      body:[
+        "土路两旁的庄稼地陆续收完，乡亲们把粮食摊在晒场上翻晒，午后日头正好，空气里都是谷物的气味。",
+        "今年秋台风来得偏晚，部分地块收得比往年仓促。晒场上，几家把收成合在一起摊开晾晒，互相照看，免得遇变天来不及收。老槐树下落了一地枯叶，孩子们在晒场边跑来跑去。",
+        "村里提醒，晒场用火要留神，烟蒂和火柴不要随手丢在草堆旁。"
+      ],
+      comments:[
+        {who:"守义",time:"2026-11-09",msg:"今年雨多，粮食成色一般，能晒出来就不错了。"}
+      ]
+    },
+    {
+      id:3,
+      title:"港湾木船集中检修，准备入冬避风",
+      meta:"2026-11-05 · 渔业组",
+      body:[
+        "几艘旧木船靠在港湾石滩边补缝上油，船主趁风浪尚小把船体检修一遍，为临近的冬季大风天做好准备。",
+        "检修主要集中在船板缝隙、船桨和缆绳上。年纪大的船主请相熟的年轻人搭把手，把船体翻过来刷洗、晾干，再逐缝填灰上油。渔业组提醒，入冬前要把锚具、缆绳再检查一遍，风浪来临前及时归港。",
+        "石滩边堆着换下的旧缆绳和碎木板，海风一阵阵吹过，带着咸腥味。"
+      ],
+      comments:[
+        {who:"船主德海",time:"2026-11-05",msg:"趁这几天风平，把船缝补一补，天冷了就不好弄了。"},
+        {who:"海边住户",time:"2026-11-06",msg:"缆绳该换的趁早换，别等大风天才想起。"},
+        {who:"小管",time:"2026-11-07",msg:"我家那条船去年就是缆绳松了，刮到石滩上。"},
+        {who:"老渔夫",time:"2026-11-07",msg:"上油要干透再下水，不然白补。"}
+      ]
+    },
+    {
+      id:4,
+      title:"村道土路铺填碎石，雨天泥泞有所改善",
+      meta:"2026-10-28 · 村务简报",
+      body:[
+        "通往海边一段坑洼土路已铺填碎石并平整路基，骑车挑担进出比从前顺当，后续将视情况继续维护。",
+        "这段路平日走的人多，逢雨季泥浆没过脚踝，挑担、推自行车都费劲。这次村里拉来碎石垫在低洼处，又用石碾压平。眼下晴天走起来已经平整不少，雨天效果还要再观察一阵。",
+        "村委会表示，后续会根据踩踏和雨水情况继续补填，也请村民不要在路旁堆放杂物，留出通行路面。"
+      ],
+      comments:[
+        {who:"通勤村民",time:"2026-10-28",msg:"比以前强多了，早上骑车不再打滑。"}
+      ]
+    },
+    {
+      id:5,
+      title:"【乡村振兴】县文物局考古队入驻我村，开展龙王庙保护性勘测",
+      meta:"2026-05-12 · 镇文化站",
+      body:[
+        "近日，县文物局考古队一行五人进驻我村，对村西头龙王庙及周边滩涂进行保护性考古勘测。",
+        "考古队在龙王庙后方地层中，发掘出一块巨大的半透明皮囊状遗存。该皮囊质地如胶，呈苍白色，保存相对完整，部分展开后长达百米。村里九十多岁的陈阿婆指着它直呼“这是当年龙王褪下来的龙皮”。",
+        "目前，专家已将该“龙皮”样本带回实验室进行鉴定，初步推测为某种大型未知生物的脱壳或残骸。龙王庙的修缮方案将根据鉴定结果进一步调整。"
+      ],
+      image:"assets/archaeology.jpg",
+      caption:"",
+      comments:[
+        {who:"陈阿婆",time:"2023-05-12",msg:"我就说是当年龙王褪下来的龙皮，老一辈传下来的话不会错。"},
+        {who:"守庙人阿贵",time:"2023-05-12",msg:"庙里供了几百年的龙王，这回算是让外头人瞧见点东西了。"},
+        {who:"回村的年轻人",time:"2023-05-13",msg:"会不会就是某种大鱼脱的壳？可百米长也太邪乎了。"},
+        {who:"赶海多年的老周",time:"2023-05-13",msg:"夜里滩涂异响那回，老人们都说过龙王显灵，现在挖出这么个东西，由不得人多想。"},
+        {who:"邻村来看热闹的",time:"2023-05-14",msg:"专家说是未知生物残骸，到底是不是龙皮，还是等鉴定结果吧。"},
+        {who:"家里长辈",time:"2023-05-14",msg:"不管是不是，庙还是得好好修缮，出海的人图个平安。"}
+      ]
+    },
+    {
+      id:9,
+      title:"县人民医院接诊一起不明原因急症病例，卫生部门发布紧急提醒",
+      meta:"2025-11-08 · 县民生频道",
+      body:[
+        "近日，县人民医院接诊了一名 62 岁男性急症患者。患者入院时伴有极其剧烈的腹痛、严重腹胀及呕吐症状，院方已为其进行紧急手术。",
+        "目前患者情况仍在观察中，卫生部门就同类不适症状向广大村民发布紧急提醒：出现持续腹痛、腹胀、呕吐等症状应尽快前往正规医疗机构就诊，切勿自行服用偏方或来路不明的药物。"
+      ],
+      attachment:{
+        name:"内部病例调查简报.pdf",
+        deleted:true
+      },
+      comments:[
+        {who:"卫生室大夫",time:"2022-11-08",msg:"这种剧烈腹痛不能硬扛，赶紧上县医院检查才是正理。"},
+        {who:"村里老人",time:"2022-11-09",msg:"听说跟前些年吃了不干净东西有关，大伙吃东西还是得当心。"}
+      ]
+    },
+    {
+      id:6,
+      title:"辟谣普法！严厉打击封建迷信！我村查处一起“假道士”贩卖假药案",
+      meta:"2025-11-03 · 村治保会",
+      body:[
+        "近期，有村民举报，某“道士”在村内回收材料，经加工后，兜售包治百病的“万能神药”。村委会联合镇派出所已将其抓获。",
+        "经查，多名服用该药的村民出现严重腹胀、胃痛症状。在此提醒广大村民：生病请前往正规卫生室，切勿轻信偏方。",
+        "目前，所有涉事村民已送医洗胃，症状缓解。"
+      ],
+      comments:[
+        {who:"吃过亏的村民",time:"2022-11-03",msg:"前些天还真有人来推销，说是符水配的药，还好没买。"},
+        {who:"卫生室大夫",time:"2022-11-04",msg:"身体不舒服就来卫生室看，来路不明的东西千万别往嘴里放。"},
+        {who:"回村办事的人",time:"2022-11-04",msg:"这种人专挑老人下手，家里长辈得多提醒一句。"}
+      ]
+    }
+  ];
+
+  var listView=document.getElementById('listView');
+  var listSection=document.getElementById('listSection');
+  var detailView=document.getElementById('detailView');
+  var detailSection=document.getElementById('detailSection');
+  var currentId=null;
+
+  function renderList(){
+    var box=document.getElementById('newsList');
+    box.innerHTML=NEWS.map(function(n){
+      var pin=n.pinned?'<span class="pin-tag">置顶</span>':'';
+      var cls=n.pinned?'pinned':'';
+      return '<li class="'+cls+'"><button class="news-item" data-id="'+n.id+'">'
+        +'<h4>'+n.title+pin+'</h4>'
+        +'<div class="news-meta">'+n.meta+' · 留言 '+n.comments.length+' 条</div>'
+        +'<p>'+n.body[0]+'</p>'
+        +'</button></li>';
+    }).join('');
+    document.getElementById('newsCount').textContent='共 '+NEWS.length+' 条';
+    Array.prototype.forEach.call(box.querySelectorAll('.news-item'),function(btn){
+      btn.addEventListener('click',function(){openArticle(parseInt(btn.getAttribute('data-id'),10));});
+    });
+  }
+
+  function findNews(id){
+    for(var i=0;i<NEWS.length;i++){if(NEWS[i].id===id)return NEWS[i];}
+    return null;
+  }
+
+  function renderComments(n){
+    var list=document.getElementById('commentList');
+    list.innerHTML=n.comments.map(function(c){
+      return '<li class="comment"><div class="who"><b>'+escapeHtml(c.who)+'</b><span class="time">'+c.time+'</span></div>'
+        +'<div class="msg">'+escapeHtml(c.msg)+'</div></li>';
+    }).join('');
+    document.getElementById('commentCount').textContent='（'+n.comments.length+' 条）';
+  }
+
+  function openArticle(id){
+    var n=findNews(id);
+    if(!n)return;
+    currentId=id;
+    document.getElementById('articleTitle').textContent=n.title;
+    document.getElementById('articleMeta').textContent=n.meta;
+    document.getElementById('articleBody').innerHTML=n.body.map(function(p){return '<p>'+escapeHtml(p)+'</p>';}).join('');
+    var fig=document.getElementById('articleFigure');
+    if(n.image){
+      document.getElementById('articleImg').src=n.image;
+      document.getElementById('articleImg').alt=n.caption||'';
+      var cap=document.getElementById('articleCaption');
+      cap.textContent=n.caption||'';
+      cap.hidden=!n.caption;
+      fig.hidden=false;
+    }else{
+      fig.hidden=true;
+    }
+    var mWrap=document.getElementById('missingWrap');
+    if(n.missing&&n.missing.length){
+      document.getElementById('missingBody').innerHTML=n.missing.map(function(m){
+        return '<tr><td class="avatar"><img src="'+m.avatar+'" alt="'+escapeHtml(m.name)+'"></td>'
+          +'<td class="name">'+escapeHtml(m.name)+'</td>'
+          +'<td>'+escapeHtml(m.sex)+' · '+escapeHtml(m.age)+'</td>'
+          +'<td>'+escapeHtml(m.detail)+'</td></tr>';
+      }).join('');
+      document.getElementById('missingNote').textContent=n.missingNote||'';
+      mWrap.hidden=false;
+    }else{
+      mWrap.hidden=true;
+    }
+    var aWrap=document.getElementById('attachWrap');
+    if(n.attachment){
+      document.getElementById('attachName').textContent=n.attachment.name;
+      document.getElementById('attachError').textContent=n.attachment.deleted
+        ?'提示：该新闻的相关附件“'+n.attachment.name+'”因违规已被管理员删除。'
+        :'';
+      aWrap.hidden=false;
+    }else{
+      aWrap.hidden=true;
+    }
+    renderComments(n);
+    document.getElementById('crumbTitle').textContent=n.title;
+    document.getElementById('commentHint').textContent='';
+    document.getElementById('commentForm').reset();
+    listView.classList.add('hidden');
+    listSection.classList.add('hidden');
+    detailView.classList.remove('hidden');
+    detailSection.classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function backToList(){
+    detailView.classList.add('hidden');
+    detailSection.classList.add('hidden');
+    listView.classList.remove('hidden');
+    listSection.classList.remove('hidden');
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g,function(ch){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+
+  document.getElementById('backToList').addEventListener('click',backToList);
+
+  document.getElementById('commentForm').addEventListener('submit',function(e){
+    e.preventDefault();
+    var n=findNews(currentId);
+    if(!n)return;
+    var text=document.getElementById('commentText').value.trim();
+    if(!text){document.getElementById('commentHint').textContent='留言内容不能为空';return;}
+    var name=document.getElementById('commentName').value.trim()||'匿名村民';
+    var now=new Date();
+    var stamp=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+    n.comments.push({who:name,time:stamp,msg:text});
+    renderComments(n);
+    this.reset();
+    document.getElementById('commentHint').textContent='留言已发表（本地演示，刷新后不保留）';
+  });
+
+  renderList();
+</script>
+
+</body>
+</html>

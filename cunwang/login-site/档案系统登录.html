@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>村内档案系统 · 登录</title>
+<style>
+  :root{
+    --paper:#f1e9d6;
+    --ink:#3a2f22;
+    --ink-soft:#5c4d38;
+    --line:#b9a67e;
+    --accent:#6d5a34;
+    --accent-soft:#8a7344;
+    --err:#8a3b2e;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:"Songti SC","STSong","SimSun","Noto Serif SC",serif;
+    min-height:100vh;color:var(--ink);
+    background:#d8c9a3;
+    display:flex;align-items:center;justify-content:center;padding:24px;
+    background-image:linear-gradient(180deg,rgba(58,47,34,.28),rgba(58,47,34,.12));
+  }
+  /* 纸张颗粒 */
+  body::before{
+    content:"";position:fixed;inset:0;pointer-events:none;opacity:.16;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+    mix-blend-mode:multiply;
+  }
+
+  .card{
+    width:100%;max-width:380px;background:rgba(244,236,217,.96);
+    border:1px solid var(--line);box-shadow:0 4px 20px rgba(58,47,34,.25);
+    padding:32px 30px 26px;position:relative;
+  }
+  .card::after{
+    content:"";position:absolute;inset:0;pointer-events:none;opacity:.08;
+    background:repeating-linear-gradient(0deg,transparent 0 24px,var(--accent) 24px 25px);
+  }
+  .brand{text-align:center;margin-bottom:24px}
+  .brand .seal{
+    width:46px;height:46px;margin:0 auto 10px;border:1px solid var(--accent-soft);
+    display:flex;align-items:center;justify-content:center;font-size:22px;color:var(--accent);
+  }
+  .brand h1{font-size:20px;letter-spacing:.22em;font-weight:700}
+  .brand .sub{font-size:12px;letter-spacing:.25em;color:var(--ink-soft);margin-top:6px}
+
+  .field{margin-bottom:16px}
+  .field label{display:block;font-size:13px;letter-spacing:.1em;color:var(--ink-soft);margin-bottom:6px}
+  .field input{
+    width:100%;padding:10px 12px;border:1px solid var(--line);background:var(--paper);
+    font-family:inherit;font-size:15px;color:var(--ink);outline:none;
+  }
+  .field input:focus{border-color:var(--accent-soft)}
+
+  /* 验证码行 */
+  .captcha-row{display:flex;gap:10px;align-items:stretch}
+  .captcha-row input{flex:1;min-width:0}
+  #captchaCanvas{
+    width:110px;height:40px;border:1px solid var(--line);cursor:pointer;flex:none;
+    background:#e7dcc2;
+  }
+
+  .row-links{display:flex;justify-content:space-between;align-items:center;margin:6px 0 18px;font-size:13px}
+  .row-links a{color:var(--accent);text-decoration:none}
+  .row-links a:hover{text-decoration:underline}
+  .remember{display:flex;align-items:center;gap:6px;color:var(--ink-soft)}
+
+  .btn{
+    width:100%;padding:12px;border:1px solid var(--accent-soft);background:var(--accent);
+    color:var(--paper);font-family:inherit;font-size:16px;letter-spacing:.3em;cursor:pointer;
+  }
+  .btn:hover{background:var(--accent-soft)}
+
+  .alt{margin-top:18px;text-align:center;font-size:13px;color:var(--ink-soft)}
+  .alt a{color:var(--accent);text-decoration:none}
+  .alt a:hover{text-decoration:underline}
+
+  .msg{min-height:18px;margin-bottom:12px;font-size:13px;color:var(--err);text-align:center}
+
+  .footer-note{margin-top:20px;text-align:center;font-size:11px;color:var(--ink-soft);letter-spacing:.08em}
+
+  /* 隐藏平台注入的水印标识 */
+  [data-custom-element="doubao-watermark"]{display:none !important}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">
+    <div class="seal">岙</div>
+    <h1>村内档案系统</h1>
+    <div class="sub">请使用登记账号登录</div>
+  </div>
+
+  <p class="msg" id="msg"></p>
+
+  <form id="loginForm" novalidate>
+    <div class="field">
+      <label for="account">账号</label>
+      <input type="text" id="account" autocomplete="username" placeholder="请输入账号">
+    </div>
+
+    <div class="field">
+      <label for="password">密码</label>
+      <input type="password" id="password" autocomplete="current-password" placeholder="请输入密码">
+    </div>
+
+    <div class="field">
+      <label for="captcha">验证码</label>
+      <div class="captcha-row">
+        <input type="text" id="captcha" autocomplete="off" placeholder="右图字符">
+        <canvas id="captchaCanvas" width="110" height="40" title="点击刷新验证码"></canvas>
+      </div>
+    </div>
+
+    <div class="row-links">
+      <label class="remember"><input type="checkbox" id="remember"> 记住账号</label>
+      <a href="#forgot" id="forgotLink">忘记密码？</a>
+    </div>
+
+    <button type="submit" class="btn">登 录</button>
+  </form>
+
+  <div class="alt">还没有账号？<a href="#register" id="registerLink">申请注册</a></div>
+  <div class="footer-note">本系统仅对村内登记人员开放</div>
+</div>
+
+<script>
+  (function(){
+    var form=document.getElementById('loginForm');
+    var msg=document.getElementById('msg');
+    var canvas=document.getElementById('captchaCanvas');
+    var ctx=canvas.getContext('2d');
+    var code='';
+
+    function drawCaptcha(){
+      var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      code='';
+      for(var i=0;i<4;i++){code+=chars.charAt(Math.floor(Math.random()*chars.length));}
+      ctx.fillStyle='#e7dcc2';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      /* 干扰线 */
+      for(var l=0;l<4;l++){
+        ctx.strokeStyle='rgba(109,90,52,.35)';
+        ctx.beginPath();
+        ctx.moveTo(Math.random()*canvas.width,Math.random()*canvas.height);
+        ctx.lineTo(Math.random()*canvas.width,Math.random()*canvas.height);
+        ctx.stroke();
+      }
+      /* 干扰点 */
+      for(var p=0;p<18;p++){
+        ctx.fillStyle='rgba(109,90,52,.3)';
+        ctx.beginPath();
+        ctx.arc(Math.random()*canvas.width,Math.random()*canvas.height,1.2,0,Math.PI*2);
+        ctx.fill();
+      }
+      ctx.fillStyle='#3a2f22';
+      ctx.font='bold 22px Georgia, serif';
+      ctx.textBaseline='middle';
+      for(var c=0;c<code.length;c++){
+        ctx.save();
+        ctx.translate(18+c*24,20+(Math.random()*6-3));
+        ctx.rotate((Math.random()*.3-.15));
+        ctx.fillText(code[c],0,0);
+        ctx.restore();
+      }
+    }
+
+    drawCaptcha();
+    canvas.addEventListener('click',drawCaptcha);
+
+    form.addEventListener('submit',function(e){
+      e.preventDefault();
+      var account=document.getElementById('account').value.trim();
+      var password=document.getElementById('password').value;
+      var captcha=document.getElementById('captcha').value.trim().toUpperCase();
+
+      if(!account||!password){msg.textContent='请填写账号和密码';return;}
+      if(captcha!==code){
+        msg.textContent='验证码不正确，请重新输入';
+        drawCaptcha();
+        document.getElementById('captcha').value='';
+        return;
+      }
+      if(account!=='无敌大冰块'||password!=='super ice'){
+        msg.textContent='账号或密码不正确';
+        drawCaptcha();
+        document.getElementById('captcha').value='';
+        document.getElementById('password').value='';
+        return;
+      }
+      /* 校验通过，跳转档案内页 */
+      msg.style.color='#5c4d38';
+      msg.textContent='校验通过，正在进入系统…';
+      setTimeout(function(){window.location.href='档案内页.html';},400);
+    });
+
+    /* 忘记密码 / 注册：占位提示，未接入流程 */
+    document.getElementById('forgotLink').addEventListener('click',function(e){
+      e.preventDefault();
+      msg.style.color='#5c4d38';
+      msg.textContent='找回密码需联系村委会管理员登记。';
+    });
+    document.getElementById('registerLink').addEventListener('click',function(e){
+      e.preventDefault();
+      msg.style.color='#5c4d38';
+      msg.textContent='新账号由村委会统一开通，暂不支持线上注册。';
+    });
+  })();
+</script>
+</body>
+</html>
